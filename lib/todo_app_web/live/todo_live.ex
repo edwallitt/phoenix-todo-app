@@ -20,6 +20,8 @@ defmodule TodoAppWeb.TodoLive do
      |> assign(:todos_empty?, todos == [])
      |> assign(:categories, categories)
      |> assign(:current_filter, nil)
+     |> assign(:editing_todo_id, nil)
+     |> assign(:edit_form, nil)
      |> assign(:form, to_form(changeset))}
   end
 
@@ -38,6 +40,63 @@ defmodule TodoAppWeb.TodoLive do
       {:error, changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset))}
     end
+  end
+
+  @impl true
+  def handle_event("start_edit", %{"id" => id}, socket) do
+    todo = Todos.get_todo!(id)
+
+    # Reconstruct the title with hashtags for editing
+    category_hashtags = Enum.map(todo.categories, &"##{&1.name}") |> Enum.join(" ")
+
+    full_title =
+      if category_hashtags != "", do: "#{todo.title} #{category_hashtags}", else: todo.title
+
+    edit_changeset = Todos.change_todo(todo, %{"title" => full_title})
+
+    {:noreply,
+     socket
+     |> assign(:editing_todo_id, String.to_integer(id))
+     |> assign(:edit_form, to_form(edit_changeset))}
+  end
+
+  @impl true
+  def handle_event("cancel_edit", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:editing_todo_id, nil)
+     |> assign(:edit_form, nil)}
+  end
+
+  @impl true
+  def handle_event("save_edit", %{"todo" => todo_params}, socket) do
+    todo = Todos.get_todo!(socket.assigns.editing_todo_id)
+
+    case Todos.update_todo_with_hashtags(todo, todo_params) do
+      {:ok, updated_todo} ->
+        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
+
+        {:noreply,
+         socket
+         |> assign(:editing_todo_id, nil)
+         |> assign(:edit_form, nil)
+         |> put_flash(:info, "Todo updated successfully!")}
+
+      {:error, changeset} ->
+        {:noreply, assign(socket, :edit_form, to_form(changeset))}
+    end
+  end
+
+  @impl true
+  def handle_event("validate_edit", %{"todo" => todo_params}, socket) do
+    todo = Todos.get_todo!(socket.assigns.editing_todo_id)
+
+    changeset =
+      todo
+      |> Todos.change_todo(todo_params)
+      |> Map.put(:action, :validate)
+
+    {:noreply, assign(socket, :edit_form, to_form(changeset))}
   end
 
   @impl true
@@ -110,7 +169,12 @@ defmodule TodoAppWeb.TodoLive do
         if todo.id == updated_todo.id, do: updated_todo, else: todo
       end)
 
-    {:noreply, assign(socket, :todos, todos)}
+    categories = Todos.list_categories()
+
+    {:noreply,
+     socket
+     |> assign(:todos, todos)
+     |> assign(:categories, categories)}
   end
 
   @impl true
