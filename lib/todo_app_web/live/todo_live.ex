@@ -43,26 +43,6 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
-  def handle_event("start_edit", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    # Reconstruct the title with hashtags for editing
-    category_hashtags = Enum.map(todo.categories, &"##{&1.name}") |> Enum.join(" ")
-
-    full_title =
-      if category_hashtags != "", do: "#{todo.title} #{category_hashtags}", else: todo.title
-
-    edit_changeset = Todos.change_todo(todo, %{"title" => full_title})
-
-    # Keep the main form valid
-    main_changeset = Todos.change_todo(%Todo{})
-
-    {:noreply,
-     socket
-     |> assign(:editing_todo_id, String.to_integer(id))
-     |> assign(:edit_form, to_form(edit_changeset))
-     |> assign(:form, to_form(main_changeset))}
-  end
 
   @impl true
   def handle_event("cancel_edit", _params, socket) do
