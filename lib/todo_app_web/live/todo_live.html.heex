@@ -101,8 +101,8 @@
             <button
               phx-click="toggle_todo"
               phx-value-id={todo.id}
-              class="flex-shrink-0 w-5 h-5 rounded border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2"
               class={[
+                "flex-shrink-0 w-5 h-5 rounded border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2",
                 if(todo.completed,
                   do: "bg-green-600 border-green-600",
                   else: "border-gray-300 hover:border-green-400"
