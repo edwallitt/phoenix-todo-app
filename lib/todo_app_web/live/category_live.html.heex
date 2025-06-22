@@ -1,0 +1,97 @@
+<Layouts.app flash={@flash}>
+  <div class="max-w-3xl mx-auto px-4 py-8">
+    <!-- Header -->
+    <div class="text-center mb-12 pb-8 border-b border-gray-200">
+      <h1 class="text-4xl font-bold text-gray-900 mb-3 tracking-tight">Manage Categories</h1>
+      <p class="text-lg text-gray-600 font-light">Organize and manage your todo categories</p>
+    </div>
+    
+<!-- Navigation back to todos -->
+    <div class="mb-8">
+      <.link
+        navigate="/"
+        class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+      >
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 19l-7-7m0 0l7-7m-7 7h18"
+          >
+          </path>
+        </svg>
+        Back to Todos
+      </.link>
+    </div>
+    
+<!-- Categories List -->
+    <%= if @categories_empty? do %>
+      <div class="bg-gray-50 rounded-lg border border-gray-200 p-12 text-center">
+        <div class="text-gray-400 mb-4">
+          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+            >
+            </path>
+          </svg>
+        </div>
+        <h3 class="text-lg font-medium text-gray-600 mb-2">No categories yet</h3>
+        <p class="text-gray-500">
+          Categories will appear here when you add todos with hashtags like #work or #personal.
+        </p>
+      </div>
+    <% else %>
+      <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+          <h2 class="text-lg font-medium text-gray-900">All Categories</h2>
+          <p class="text-sm text-gray-600 mt-1">
+            Manage your todo categories and see usage counts
+          </p>
+        </div>
+
+        <%= for category <- @categories do %>
+          <div class="flex items-center justify-between p-6 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
+            <!-- Category Info -->
+            <div class="flex items-center gap-4">
+              <div class="flex-shrink-0">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
+                  #{category.name}
+                </span>
+              </div>
+              <div>
+                <h3 class="text-sm font-medium text-gray-900">{category.name}</h3>
+                <p class="text-sm text-gray-500">
+                  {Todos.get_category_todo_count(category.id)}
+                  <%= if Todos.get_category_todo_count(category.id) == 1 do %>
+                    todo
+                  <% else %>
+                    todos
+                  <% end %>
+                </p>
+              </div>
+            </div>
+            
+<!-- Delete Button -->
+            <button
+              phx-click="delete_category"
+              phx-value-id={category.id}
+              class="flex-shrink-0 px-3 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 border border-red-200 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-red-200"
+            >
+              Delete
+            </button>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-500">
+          💡 Tip: Deleting a category will remove it from all associated todos
+        </p>
+      </div>
+    <% end %>
+  </div>
+</Layouts.app>
