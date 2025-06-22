@@ -2,9 +2,13 @@ defmodule TodoApp.Todos.Todo do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias TodoApp.Todos.{Category, TodoCategory}
+
   schema "todos" do
     field :title, :string
     field :completed, :boolean, default: false
+
+    many_to_many :categories, Category, join_through: TodoCategory
 
     timestamps()
   end
