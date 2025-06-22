@@ -72,6 +72,35 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
+  Updates a todo with hashtag parsing for categories.
+  """
+  def update_todo_with_hashtags(%Todo{} = todo, attrs) do
+    title = Map.get(attrs, "title", "")
+
+    # Parse hashtags and clean title
+    {clean_title, category_names} = parse_hashtags_from_title(title)
+
+    # Update the todo with clean title
+    clean_attrs = Map.put(attrs, "title", clean_title)
+
+    case todo
+         |> Todo.changeset(clean_attrs)
+         |> Repo.update() do
+      {:ok, updated_todo} ->
+        # Clear existing category associations
+        from(tc in TodoCategory, where: tc.todo_id == ^updated_todo.id)
+        |> Repo.delete_all()
+
+        # Associate with new categories
+        todo_with_categories = associate_todo_with_categories(updated_todo, category_names)
+        {:ok, todo_with_categories}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  @doc """
   Deletes a todo.
   """
   def delete_todo(%Todo{} = todo) do
