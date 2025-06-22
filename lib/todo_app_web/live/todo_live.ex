@@ -43,12 +43,14 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
+  def handle_event("start_edit", %{"id" => id}, socket) do
+    todo = Todos.get_todo!(id)
+    changeset = Todos.change_todo(todo)
 
     {:noreply,
      socket
-     |> assign(:editing_todo_id, nil)
-     |> assign(:edit_form, nil)
-     |> assign(:form, to_form(Todos.change_todo(%Todo{})))}
+     |> assign(:editing_todo_id, todo.id)
+     |> assign(:edit_form, to_form(changeset))}
   end
 
   @impl true
