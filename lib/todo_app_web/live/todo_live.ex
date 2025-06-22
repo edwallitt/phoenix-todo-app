@@ -11,12 +11,15 @@ defmodule TodoAppWeb.TodoLive do
     end
 
     todos = Todos.list_todos()
+    categories = Todos.list_categories()
     changeset = Todos.change_todo(%Todo{})
 
     {:ok,
      socket
      |> assign(:todos, todos)
      |> assign(:todos_empty?, todos == [])
+     |> assign(:categories, categories)
+     |> assign(:current_filter, nil)
      |> assign(:form, to_form(changeset))}
   end
 
@@ -66,6 +69,18 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
+  def handle_event("filter_by_category", %{"category" => category_slug}, socket) do
+    filter = if category_slug == "all", do: nil, else: category_slug
+    todos = Todos.list_todos(filter)
+
+    {:noreply,
+     socket
+     |> assign(:todos, todos)
+     |> assign(:todos_empty?, todos == [])
+     |> assign(:current_filter, filter)}
+  end
+
+  @impl true
   def handle_event("validate", %{"todo" => todo_params}, socket) do
     changeset =
       %Todo{}
@@ -77,12 +92,15 @@ defmodule TodoAppWeb.TodoLive do
 
   @impl true
   def handle_info({:todo_created, todo}, socket) do
-    todos = [todo | socket.assigns.todos]
+    # Refresh todos list to include the new todo with categories
+    todos = Todos.list_todos(socket.assigns.current_filter)
+    categories = Todos.list_categories()
 
     {:noreply,
      socket
      |> assign(:todos, todos)
-     |> assign(:todos_empty?, false)}
+     |> assign(:categories, categories)
+     |> assign(:todos_empty?, todos == [])}
   end
 
   @impl true
