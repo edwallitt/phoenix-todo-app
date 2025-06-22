@@ -74,13 +74,12 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
-  @impl true\
-  def handle_event("cancel_edit", _params, socket) do\
-    {:noreply,\
-     socket\
-     |> assign(:editing_todo_id, nil)\
-     |> assign(:edit_form, nil)}\
-  end\
+  def handle_event("cancel_edit", _params, socket) do
+    {:noreply,
+     socket
+     |> assign(:editing_todo_id, nil)
+     |> assign(:edit_form, nil)}
+  end
 
   def handle_event("validate_edit", %{"todo" => todo_params}, socket) do
     todo = Todos.get_todo!(socket.assigns.editing_todo_id)
