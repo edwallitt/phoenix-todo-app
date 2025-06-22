@@ -44,8 +44,6 @@ defmodule TodoAppWeb.TodoLive do
 
   @impl true
 
-  @impl true
-  def handle_event("cancel_edit", _params, socket) do
     {:noreply,
      socket
      |> assign(:editing_todo_id, nil)
