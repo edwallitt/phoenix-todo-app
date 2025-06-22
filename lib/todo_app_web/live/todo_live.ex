@@ -43,7 +43,6 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
-  def handle_event("start_edit", %{"id" => id}, socket) do
     todo = Todos.get_todo!(id)
     changeset = Todos.change_todo(todo)
 
