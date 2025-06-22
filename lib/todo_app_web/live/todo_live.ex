@@ -85,6 +85,7 @@ defmodule TodoAppWeb.TodoLive do
          socket
          |> assign(:editing_todo_id, nil)
          |> assign(:edit_form, nil)
+         |> assign(:form, to_form(Todos.change_todo(%Todo{})))
          |> put_flash(:info, "Todo updated successfully!")}
 
       {:error, changeset} ->
