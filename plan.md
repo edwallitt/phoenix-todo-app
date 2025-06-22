@@ -1,32 +1,33 @@
 # NEJM-Style Todo App Plan
 
 - [x] Generate a Phoenix LiveView project called `todo_app` 
-- [ ] Start the server to follow along with development
-- [ ] Replace default home page with static NEJM-inspired design mockup
-- [ ] Create Todo schema and migration with:
+- [x] Start the server to follow along with development
+- [x] Replace default home page with static NEJM-inspired design mockup
+- [x] Create Todo schema and migration with:
   - `title` (string, required)
   - `completed` (boolean, default false)
   - `inserted_at` and `updated_at` timestamps
-- [ ] Implement TodoLive LiveView with real-time PubSub updates:
+- [x] Implement TodoLive LiveView with real-time PubSub updates:
   - `mount/3` - load all todos and assign form
   - `handle_event("add_todo", ...)` - create new todo, broadcast update
   - `handle_event("toggle_todo", ...)` - toggle completion, broadcast update  
   - `handle_event("delete_todo", ...)` - delete todo, broadcast update
   - `handle_event("validate", ...)` - validate form inputs
-- [ ] Create todo_live.html.heex template with modern clinical design:
+- [x] Create todo_live.html.heex template with modern clinical design:
   - Clean form for adding todos
   - List of todos with toggle/delete actions
   - Mobile-responsive layout
   - Green accent colors for actions
-- [ ] Update layouts to match NEJM clinical aesthetic:
+- [x] Update layouts to match NEJM clinical aesthetic:
   - Force light theme in root.html.heex
   - Remove default Phoenix styling from <Layouts.app>
   - Update app.css with clinical colors and typography
-- [ ] Create Todos context for CRUD operations:
+- [x] Create Todos context for CRUD operations:
   - `list_todos/0` - get all todos
   - `create_todo/1` - create new todo
   - `update_todo/2` - update existing todo
   - `delete_todo/1` - delete todo
-- [ ] Update router (replace home route with todo route)
-- [ ] Test all functionality and mobile responsiveness
-- [ ] Final verification and cleanup
+- [x] Update router (replace home route with todo route)
+- [x] Test all functionality and mobile responsiveness
+- [x] Final verification and cleanup
+
