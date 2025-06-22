@@ -54,10 +54,14 @@ defmodule TodoAppWeb.TodoLive do
 
     edit_changeset = Todos.change_todo(todo, %{"title" => full_title})
 
+    # Keep the main form valid
+    main_changeset = Todos.change_todo(%Todo{})
+
     {:noreply,
      socket
      |> assign(:editing_todo_id, String.to_integer(id))
-     |> assign(:edit_form, to_form(edit_changeset))}
+     |> assign(:edit_form, to_form(edit_changeset))
+     |> assign(:form, to_form(main_changeset))}
   end
 
   @impl true
@@ -65,7 +69,8 @@ defmodule TodoAppWeb.TodoLive do
     {:noreply,
      socket
      |> assign(:editing_todo_id, nil)
-     |> assign(:edit_form, nil)}
+     |> assign(:edit_form, nil)
+     |> assign(:form, to_form(Todos.change_todo(%Todo{})))}
   end
 
   @impl true
