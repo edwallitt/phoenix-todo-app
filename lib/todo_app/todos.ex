@@ -93,6 +93,31 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
+  Gets a single category.
+  """
+  def get_category!(id), do: Repo.get!(Category, id)
+
+  @doc """
+  Deletes a category and all associated todo-category relationships.
+  """
+  def delete_category(%Category{} = category) do
+    # Delete all todo-category associations first
+    from(tc in TodoCategory, where: tc.category_id == ^category.id)
+    |> Repo.delete_all()
+
+    # Then delete the category
+    Repo.delete(category)
+  end
+
+  @doc """
+  Returns the count of todos associated with a category.
+  """
+  def get_category_todo_count(category_id) do
+    from(tc in TodoCategory, where: tc.category_id == ^category_id, select: count())
+    |> Repo.one()
+  end
+
+  @doc """
   Parses hashtags from a title string and returns {clean_title, [category_names]}.
   """
   def parse_hashtags_from_title(title) do
