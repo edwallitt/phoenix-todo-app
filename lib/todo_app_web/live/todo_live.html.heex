@@ -131,41 +131,83 @@
               <% end %>
             </button>
             
-<!-- Todo Text and Categories -->
+<!-- Todo Text and Categories OR Edit Form -->
             <div class="flex-1 min-w-0">
-              <p class={[
-                "text-sm font-medium transition-colors mb-1",
-                if(todo.completed, do: "text-gray-500 line-through", else: "text-gray-900")
-              ]}>
-                {todo.title}
-              </p>
-              <%= if todo.categories != [] do %>
-                <div class="flex flex-wrap gap-1">
-                  <%= for category <- todo.categories do %>
-                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                      #{category.name}
-                    </span>
+              <%= if @editing_todo_id == todo.id do %>
+                <!-- Edit Form -->
+                <.form
+                  for={@edit_form}
+                  id={"edit-todo-form-#{todo.id}"}
+                  phx-change="validate_edit"
+                  phx-submit="save_edit"
+                  phx-window-keydown="cancel_edit"
+                  phx-key="Escape"
+                >
+                  <div class="flex gap-2">
+                    <.input
+                      field={@edit_form[:title]}
+                      type="text"
+                      class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md text-gray-900 bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors"
+                      error_class="border-red-400 focus:border-red-500 focus:ring-red-200"
+                    />
+                    <button
+                      type="submit"
+                      class="px-3 py-2 text-sm bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors"
+                    >
+                      Save
+                    </button>
+                    <button
+                      type="button"
+                      phx-click="cancel_edit"
+                      class="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </.form>
+                <p class="text-xs text-gray-500 mt-1">
+                  💡 Use #hashtags to add or change categories
+                </p>
+              <% else %>
+                <!-- View Mode -->
+                <div phx-click="start_edit" phx-value-id={todo.id} class="cursor-pointer">
+                  <p class={[
+                    "text-sm font-medium transition-colors mb-1",
+                    if(todo.completed, do: "text-gray-500 line-through", else: "text-gray-900")
+                  ]}>
+                    {todo.title}
+                  </p>
+                  <%= if todo.categories != [] do %>
+                    <div class="flex flex-wrap gap-1">
+                      <%= for category <- todo.categories do %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                          #{category.name}
+                        </span>
+                      <% end %>
+                    </div>
                   <% end %>
                 </div>
               <% end %>
             </div>
             
 <!-- Delete Button -->
-            <button
-              phx-click="delete_todo"
-              phx-value-id={todo.id}
-              class="flex-shrink-0 p-2 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 rounded transition-colors"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                >
-                </path>
-              </svg>
-            </button>
+            <%= if @editing_todo_id != todo.id do %>
+              <button
+                phx-click="delete_todo"
+                phx-value-id={todo.id}
+                class="flex-shrink-0 p-2 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 rounded transition-colors"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  >
+                  </path>
+                </svg>
+              </button>
+            <% end %>
           </div>
         <% end %>
       </div>
