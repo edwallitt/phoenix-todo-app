@@ -181,6 +181,7 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
+  def handle_info({:todo_updated, updated_todo}, socket) do
     todos =
       Enum.map(socket.assigns.todos, fn todo ->
         if todo.id == updated_todo.id, do: updated_todo, else: todo
