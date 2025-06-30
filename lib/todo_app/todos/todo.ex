@@ -17,7 +17,7 @@ defmodule TodoApp.Todos.Todo do
   @doc false
   def changeset(todo, attrs) do
     todo
-    |> cast(attrs, [:title, :completed])
+    |> cast(attrs, [:title, :completed, :important])
     |> validate_required([:title])
     |> validate_length(:title, min: 1, max: 255)
   end
@@ -27,7 +27,7 @@ defmodule TodoApp.Todos.Todo do
   """
   def create_changeset(todo, attrs) do
     todo
-    |> cast(attrs, [:title, :completed])
+    |> cast(attrs, [:title, :completed, :important])
     |> validate_required([:title])
     |> validate_length(:title, min: 1, max: 255)
   end
