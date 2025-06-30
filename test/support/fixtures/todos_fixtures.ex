@@ -27,7 +27,7 @@ defmodule TodoApp.TodosFixtures do
   def category_fixture(attrs \\ %{}) do
     name = attrs[:name] || "some category"
 
-    {:ok, category} =
+    category =
       %{"name" => name}
       |> Todos.find_or_create_category()
 
@@ -42,7 +42,7 @@ defmodule TodoApp.TodosFixtures do
 
     categories =
       Enum.map(category_names, fn name ->
-        {:ok, category} = Todos.find_or_create_category(%{"name" => name})
+        category = Todos.find_or_create_category(name)
         category
       end)
 
