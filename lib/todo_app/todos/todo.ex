@@ -7,6 +7,7 @@ defmodule TodoApp.Todos.Todo do
   schema "todos" do
     field :title, :string
     field :completed, :boolean, default: false
+    field :important, :boolean, default: false
 
     many_to_many :categories, Category, join_through: TodoCategory
 
