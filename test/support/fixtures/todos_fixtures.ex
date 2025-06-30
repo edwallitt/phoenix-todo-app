@@ -28,7 +28,7 @@ defmodule TodoApp.TodosFixtures do
     name = Map.get(attrs, :name, Map.get(attrs, "name", "some category")) || "some category"
 
     category =
-      %{"name" => name}
+      name
       |> Todos.find_or_create_category()
 
     category
