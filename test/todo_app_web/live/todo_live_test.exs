@@ -237,7 +237,7 @@ defmodule TodoAppWeb.TodoLiveTest do
       refute html =~ "edit-todo-form-#{todo.id}"
       refute html =~ "Save"
       refute html =~ "Cancel"
-      assert html =~ "Don't edit me"
+      assert html =~ "Don&#39;t edit me"
     end
 
     test "hides add todo form during edit mode", %{conn: conn} do
@@ -251,7 +251,8 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> render_click()
 
       html = render(view)
-      refute html =~ "todo-form"
+      # The add todo form should be hidden during edit mode
+      refute html =~ "Add a new task... (use #hashtags for categories)"
     end
 
     test "shows add todo form after editing complete", %{conn: conn} do
