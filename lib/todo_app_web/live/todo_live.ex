@@ -181,17 +181,17 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
-  @impl true\
-  def handle_info({:todo_updated, updated_todo}, socket) do\
-    # Re-fetch todos to ensure proper sorting by importance\
-    todos = Todos.list_todos(socket.assigns.current_filter)\
-    categories = Todos.list_categories()\
-\
-    {:noreply,\
-     socket\
-     |> assign(:todos, todos)\
-     |> assign(:categories, categories)}\
+  def handle_info({:todo_updated, updated_todo}, socket) do
+    # Re-fetch todos to ensure proper sorting by importance
+    todos = Todos.list_todos(socket.assigns.current_filter)
+    categories = Todos.list_categories()
+
+    {:noreply,
+     socket
+     |> assign(:todos, todos)
+     |> assign(:categories, categories)}
   end
+
   def handle_info({:todo_deleted, deleted_todo}, socket) do
     todos = Enum.reject(socket.assigns.todos, &(&1.id == deleted_todo.id))
 
