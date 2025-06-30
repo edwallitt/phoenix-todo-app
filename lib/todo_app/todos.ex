@@ -112,11 +112,11 @@ defmodule TodoApp.Todos do
   def create_todo(attrs \\ %{}) do
     title = Map.get(attrs, "title", "")
 
-    # Parse hashtags and clean title
-    {clean_title, category_names} = parse_hashtags_from_title(title)
+    # Parse hashtags, importance flag and clean title
+    {clean_title, category_names, is_important} = parse_hashtags_and_importance_from_title(title)
 
     # Create the todo with clean title
-    clean_attrs = Map.put(attrs, "title", clean_title)
+    clean_attrs = attrs |> Map.put("title", clean_title) |> Map.put("important", is_important)
 
     case %Todo{}
          |> Todo.create_changeset(clean_attrs)
