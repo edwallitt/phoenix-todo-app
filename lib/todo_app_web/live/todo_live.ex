@@ -151,20 +151,19 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
-  @impl true\
-  def handle_event("start_edit", %{"id" => id}, socket) do\
-    todo = Todos.get_todo!(id)\
-\
-    # Reconstruct the title with hashtags and #imp for editing\
-    title_with_hashtags = Todos.reconstruct_title_with_hashtags(todo)\
-\
-    changeset = Todos.change_todo(todo, %{title: title_with_hashtags})\
-\
-    {:noreply,\
-     socket\
-     |> assign(:editing_todo_id, todo.id)\
-     |> assign(:edit_form, to_form(changeset))}\
-  end\
+  def handle_event("start_edit", %{"id" => id}, socket) do
+    todo = Todos.get_todo!(id)
+
+    # Reconstruct the title with hashtags and #imp for editing
+    title_with_hashtags = Todos.reconstruct_title_with_hashtags(todo)
+
+    changeset = Todos.change_todo(todo, %{title: title_with_hashtags})
+
+    {:noreply,
+     socket
+     |> assign(:editing_todo_id, todo.id)
+     |> assign(:edit_form, to_form(changeset))}
+  end
 
   def handle_event("validate", %{"todo" => todo_params}, socket) do
     changeset =
