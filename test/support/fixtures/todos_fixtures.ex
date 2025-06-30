@@ -9,7 +9,11 @@ defmodule TodoApp.TodosFixtures do
   @doc """
   Generate a todo.
   """
-  def todo_fixture(attrs \\ %{}) do
+  def todo_fixture(
+      # Convert all keys to strings
+      string_attrs = for {key, value} <- attrs, into: %{}, do: {to_string(key), value}
+      
+      string_attrs \\ %{}) do
     {:ok, todo} =
       attrs
       |> Enum.into(%{
