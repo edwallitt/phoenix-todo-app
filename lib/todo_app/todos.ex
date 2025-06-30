@@ -133,6 +133,21 @@ defmodule TodoApp.Todos do
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking todo changes.
   """
+  @doc """\
+  Reconstructs the full title with hashtags for editing, including #imp if important.\
+  """\
+  def reconstruct_title_with_hashtags(todo) do\
+    category_hashtags = Enum.map(todo.categories, fn category -> "##{category.name}" end)\
+    importance_hashtag = if todo.important, do: ["#imp"], else: []\
+    all_hashtags = category_hashtags ++ importance_hashtag\
+\
+    if Enum.empty?(all_hashtags) do\
+      todo.title\
+    else\
+      todo.title <> " " <> Enum.join(all_hashtags, " ")\
+    end\
+  end\
+
   def change_todo(%Todo{} = todo, attrs \\ %{}) do
     Todo.changeset(todo, attrs)
   end
