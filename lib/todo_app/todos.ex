@@ -31,7 +31,7 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
-  Returns the list of todos ordered by insertion date (newest first).
+  Returns the list of todos ordered by importance first, then by insertion date (newest first).
   Optionally filters by category.
   """
   def list_todos(category_filter \\ nil) do
@@ -56,55 +56,9 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
-
-  @doc """
   Gets a single todo.
   """
   def get_todo!(id), do: Repo.get!(Todo, id) |> Repo.preload(:categories)
-
-  @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
 
   @doc """
   Creates a todo with hashtag parsing for categories.
@@ -132,58 +86,12 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
-
-  @doc """
   Updates a todo.
   """
   def update_todo(%Todo{} = todo, attrs) do
     todo
     |> Todo.changeset(attrs)
     |> Repo.update()
-  end
-
-  @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
   end
 
   @doc """
@@ -216,56 +124,10 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
-
-  @doc """
   Deletes a todo.
   """
   def delete_todo(%Todo{} = todo) do
     Repo.delete(todo)
-  end
-
-  @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
   end
 
   @doc """
@@ -276,29 +138,6 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
-
-  @doc """
   Returns all categories ordered by name.
   """
   def list_categories do
@@ -306,55 +145,9 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
-
-  @doc """
   Gets a single category.
   """
   def get_category!(id), do: Repo.get!(Category, id)
-
-  @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
 
   @doc """
   Deletes a category and all associated todo-category relationships.
@@ -369,100 +162,11 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
-
-  @doc """
   Returns the count of todos associated with a category.
   """
   def get_category_todo_count(category_id) do
     from(tc in TodoCategory, where: tc.category_id == ^category_id, select: count())
     |> Repo.one()
-  end
-
-  @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
-
-  @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-
-  def parse_hashtags_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    category_names = List.flatten(matches)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names}
-  end
-
-  @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
   end
 
   @doc """
@@ -489,29 +193,6 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
-  end
-
-  @doc """
   Finds an existing category or creates a new one.
   """
   def find_or_create_category(name) do
@@ -529,29 +210,6 @@ defmodule TodoApp.Todos do
       category ->
         category
     end
-  end
-
-  @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
-  """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
   end
 
   @doc """
