@@ -77,11 +77,12 @@ defmodule TodoApp.Todos do
   def update_todo_with_hashtags(%Todo{} = todo, attrs) do
     title = Map.get(attrs, "title", "")
 
-    # Parse hashtags and clean title
-    {clean_title, category_names} = parse_hashtags_from_title(title)
+    # Parse hashtags and check for #imp flag
+    {clean_title, category_names, is_important} = parse_hashtags_and_importance_from_title(title)
 
-    # Update the todo with clean title
-    clean_attrs = Map.put(attrs, "title", clean_title)
+    # Update the todo with clean title and important flag
+    clean_attrs = attrs |> Map.put("title", clean_title) |> Map.put("important", is_important)
+
 
     case todo
          |> Todo.changeset(clean_attrs)
@@ -149,6 +150,28 @@ defmodule TodoApp.Todos do
   @doc """
   Parses hashtags from a title string and returns {clean_title, [category_names]}.
   """
+  @doc """\
+  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.\
+  """\
+  def parse_hashtags_and_importance_from_title(title) do\
+    # Find all hashtags in the title\
+    hashtag_regex = ~r/#(\w+)/\
+    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)\
+    all_tags = List.flatten(matches)\
+    \
+    # Check if #imp is present and separate it from categories\
+    is_important = "imp" in all_tags\
+    category_names = Enum.reject(all_tags, &(&1 == "imp"))\
+    \
+    # Remove hashtags from title and clean up extra spaces\
+    clean_title =\
+      title\
+      |> String.replace(hashtag_regex, "")\
+      |> String.trim()\
+      |> String.replace(~r/\s+/, " ")\
+    \
+    {clean_title, category_names, is_important}\
+  end
   def parse_hashtags_from_title(title) do
     # Find all hashtags in the title
     hashtag_regex = ~r/#(\w+)/
