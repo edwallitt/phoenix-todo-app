@@ -168,10 +168,13 @@ defmodule TodoApp.Todos do
   @doc """
   Finds or creates categories and associates them with a todo.
   """
-  def associate_todo_with_categories(todo, category_names) do
+  def associate_todo_with_categories(todo, categories_or_names) do
     categories =
-      Enum.map(category_names, fn name ->
-        find_or_create_category(name)
+      Enum.map(categories_or_names, fn category_or_name ->
+        case category_or_name do
+          %Category{} = category -> category
+          name when is_binary(name) -> find_or_create_category(name)
+        end
       end)
 
     # Create associations
