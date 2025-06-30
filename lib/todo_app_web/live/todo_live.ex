@@ -43,12 +43,12 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
+  def handle_event("edit_todo", %{"id" => id}, socket) do
     todo = Todos.get_todo!(id)
-    # Reconstruct the title with hashtags and #imp for editing
 
-      if hashtags == [] do
-      else
-      end
+    # Reconstruct the title with hashtags and #imp for editing
+    title_with_hashtags = Todos.reconstruct_title_with_hashtags(todo)
+
     changeset = Todos.change_todo(todo, %{title: title_with_hashtags})
 
     {:noreply,
