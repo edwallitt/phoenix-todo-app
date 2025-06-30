@@ -154,7 +154,7 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
-  def handle_info({:todo_created, todo}, socket) do
+  def handle_info({:todo_created, _todo}, socket) do
     # Refresh todos list to include the new todo with categories
     todos = Todos.list_todos(socket.assigns.current_filter)
     categories = Todos.list_categories()
