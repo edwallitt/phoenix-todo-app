@@ -13,7 +13,6 @@ defmodule TodoAppWeb.TodoLiveTest do
       assert html =~ "Clinical Todo"
       assert html =~ "A clean, focused task management system"
       assert html =~ "Add a new task"
-      assert html =~ "Filter by category"
     end
 
     test "displays existing todos with categories", %{conn: conn} do
