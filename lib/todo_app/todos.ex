@@ -127,7 +127,39 @@ defmodule TodoApp.Todos do
   Deletes a todo.
   """
   def delete_todo(%Todo{} = todo) do
-    Repo.delete(todo)
+    Repo.transaction(fn ->
+      # Get all categories associated with this todo before deletion
+      category_ids =
+        from(tc in TodoCategory, where: tc.todo_id == ^todo.id, select: tc.category_id)
+        |> Repo.all()
+
+      # Delete the todo (this will also delete join table entries if we had foreign key constraints)
+      case Repo.delete(todo) do
+        {:ok, deleted_todo} ->
+          # Manually delete join table entries (in case no FK constraints)
+          from(tc in TodoCategory, where: tc.todo_id == ^todo.id)
+          |> Repo.delete_all()
+
+          # Check each category to see if it's now orphaned and delete if so
+          Enum.each(category_ids, fn category_id ->
+            remaining_todos_count =
+              from(tc in TodoCategory, where: tc.category_id == ^category_id, select: count())
+              |> Repo.one()
+
+            if remaining_todos_count == 0 do
+              case Repo.get(Category, category_id) do
+                nil -> :ok
+                category -> Repo.delete(category)
+              end
+            end
+          end)
+
+          deleted_todo
+
+        {:error, changeset} ->
+          Repo.rollback(changeset)
+      end
+    end)
   end
 
   @doc """
