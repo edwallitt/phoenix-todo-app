@@ -46,8 +46,8 @@ defmodule TodoAppWeb.TodoLive do
   def handle_event("start_edit", %{"id" => id}, socket) do
     todo = Todos.get_todo!(id)
 
-    # Reconstruct the title with hashtags for editing
-    hashtags = Enum.map(todo.categories, fn category -> "##{category.name}" end)
+    # Reconstruct the title with hashtags and #imp for editing
+    title_with_hashtags = Todos.reconstruct_title_with_hashtags(todo)
 
     title_with_hashtags =
       if hashtags == [] do
@@ -181,7 +181,7 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
-  def handle_info({:todo_updated, updated_todo}, socket) do
+  def handle_info({:todo_updated, _updated_todo}, socket) do
     # Re-fetch todos to ensure proper sorting by importance
     todos = Todos.list_todos(socket.assigns.current_filter)
     categories = Todos.list_categories()
