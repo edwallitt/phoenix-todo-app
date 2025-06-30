@@ -15,7 +15,7 @@ defmodule TodoApp.Todos do
     query =
       from t in Todo,
         preload: [:categories],
-        order_by: [desc: t.inserted_at]
+        order_by: [desc: t.important, desc: t.inserted_at]
 
     query =
       if category_filter do
