@@ -25,7 +25,7 @@ defmodule TodoApp.TodosFixtures do
   Generate a category.
   """
   def category_fixture(attrs \\ %{}) do
-    name = attrs[:name] || "some category"
+    name = Map.get(attrs, :name, Map.get(attrs, "name", "some category")) || "some category"
 
     category =
       %{"name" => name}
