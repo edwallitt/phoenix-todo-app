@@ -150,23 +150,25 @@ defmodule TodoApp.Todos do
   Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
   """
   def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_tags = List.flatten(matches)
+    def parse_hashtags_and_importance_from_title(title) do
+      # Find all hashtags in the title
+      hashtag_regex = ~r/#(\w+)/
+      matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
+      all_tags = List.flatten(matches)
 
-    # Check if #imp is present and separate it from categories
-    is_important = "imp" in all_tags
-    category_names = Enum.reject(all_tags, &(&1 == "imp"))
+      # Check if #imp is present and separate it from categories
+      is_important = "imp" in all_tags
+      category_names = Enum.reject(all_tags, &(&1 == "imp"))
 
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
+      # Remove hashtags from title and clean up extra spaces
+      clean_title =
+        title
+        |> String.replace(hashtag_regex, "")
+        |> String.trim()
+        |> String.replace(~r/\s+/, " ")
 
-    {clean_title, category_names, is_important}
+      {clean_title, category_names, is_important}
+    end
   end
 
   def parse_hashtags_from_title(title) do
