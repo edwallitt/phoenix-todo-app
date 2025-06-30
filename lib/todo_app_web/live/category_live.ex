@@ -14,7 +14,7 @@ defmodule TodoAppWeb.CategoryLive do
     {:ok,
      socket
      |> assign(:categories, categories)
-     |> assign(:categories_empty?, categories == [])}
+     |> assign(:categories_empty?, Enum.empty?(categories))}
   end
 
   @impl true
@@ -40,7 +40,7 @@ defmodule TodoAppWeb.CategoryLive do
     {:noreply,
      socket
      |> assign(:categories, categories)
-     |> assign(:categories_empty?, categories == [])}
+     |> assign(:categories_empty?, Enum.empty?(categories))}
   end
 
   @impl true
@@ -50,6 +50,6 @@ defmodule TodoAppWeb.CategoryLive do
     {:noreply,
      socket
      |> assign(:categories, categories)
-     |> assign(:categories_empty?, categories == [])}
+     |> assign(:categories_empty?, Enum.empty?(categories))}
   end
 end
