@@ -181,16 +181,6 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   @impl true
-
-    categories = Todos.list_categories()
-
-    {:noreply,
-     socket
-     |> assign(:todos, todos)
-     |> assign(:categories, categories)}
-  end
-
-  @impl true
   def handle_info({:todo_deleted, deleted_todo}, socket) do
     todos = Enum.reject(socket.assigns.todos, &(&1.id == deleted_todo.id))
 
