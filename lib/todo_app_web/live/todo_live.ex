@@ -105,51 +105,17 @@ defmodule TodoAppWeb.TodoLive do
 
   @impl true
   def handle_event("toggle_todo", %{"id" => id}, socket) do
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
     todo = Todos.get_todo!(id)
 
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
-    todo = Todos.get_todo!(id)
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
-
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
     case Todos.update_todo(todo, %{completed: !todo.completed}) do
+      {:ok, updated_todo} ->
+        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
+        {:noreply, socket}
+
+      {:error, _changeset} ->
+        {:noreply, put_flash(socket, :error, "Failed to update todo")}
+    end
+  end
 
   @impl true
   def handle_event("toggle_important", %{"id" => id}, socket) do
@@ -163,112 +129,6 @@ defmodule TodoAppWeb.TodoLive do
       {:error, _changeset} ->
         {:noreply, put_flash(socket, :error, "Failed to update todo")}
     end
-  end
-      {:ok, updated_todo} ->
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
-        {:noreply, socket}
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
-
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
-      {:error, _changeset} ->
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
-    end
-
-  @impl true
-  def handle_event("toggle_important", %{"id" => id}, socket) do
-    todo = Todos.get_todo!(id)
-
-    case Todos.update_todo(todo, %{important: !todo.important}) do
-      {:ok, updated_todo} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
-        {:noreply, socket}
-
-      {:error, _changeset} ->
-        {:noreply, put_flash(socket, :error, "Failed to update todo")}
-    end
-  end
   end
 
   @impl true
