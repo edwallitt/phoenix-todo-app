@@ -9,12 +9,12 @@ defmodule TodoApp.TodosFixtures do
   @doc """
   Generate a todo.
   """
-  def todo_fixture(attrs \\ %{}) do
+  def todo_fixture(:attrs \\ %{}) do
     {:ok, todo} =
-      attrs
+      :attrs
       |> Enum.into(%{
-        title: "some title",
-        completed: false
+        "title" => "some title",
+        "completed" => false
       })
       |> Todos.create_todo()
 
@@ -24,11 +24,11 @@ defmodule TodoApp.TodosFixtures do
   @doc """
   Generate a category.
   """
-  def category_fixture(attrs \\ %{}) do
-    name = attrs[:name] || "some category"
+  def category_fixture(:attrs \\ %{}) do
+    name = :attrs[:name] || "some category"
 
     {:ok, category} =
-      %{name: name}
+      %{"name" => name}
       |> Todos.find_or_create_category()
 
     category
@@ -37,12 +37,12 @@ defmodule TodoApp.TodosFixtures do
   @doc """
   Generate a todo with categories.
   """
-  def todo_with_categories_fixture(todo_attrs \\ %{}, category_names \\ []) do
-    todo = todo_fixture(todo_attrs)
+  def todo_with_categories_fixture(todo_:attrs \\ %{}, category_names \\ []) do
+    todo = todo_fixture(todo_:attrs)
 
     categories =
       Enum.map(category_names, fn name ->
-        {:ok, category} = Todos.find_or_create_category(%{name: name})
+        {:ok, category} = Todos.find_or_create_category(%{"name" => name})
         category
       end)
 
