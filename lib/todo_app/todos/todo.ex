@@ -10,6 +10,7 @@ defmodule TodoApp.Todos.Todo do
     field :important, :boolean, default: false
 
     many_to_many :categories, Category, join_through: TodoCategory
+    has_many :notes, TodoApp.Todos.Note
 
     timestamps()
   end
