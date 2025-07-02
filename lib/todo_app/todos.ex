@@ -162,12 +162,6 @@ defmodule TodoApp.Todos do
     end)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking todo changes.
-  """
-  @doc """
-  Reconstructs the full title with hashtags for editing, including #imp if important.
-  """
   alias TodoApp.Todos.Note
 
   @doc """
