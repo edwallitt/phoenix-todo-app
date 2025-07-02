@@ -168,6 +168,59 @@ defmodule TodoApp.Todos do
   @doc """
   Reconstructs the full title with hashtags for editing, including #imp if important.
   """
+\
+  ## Notes\
+\
+  alias TodoApp.Todos.Note\
+\
+  @doc """\
+  Returns the list of notes for a todo.\
+  """\
+  def list_notes_for_todo(todo_id) do\
+    from(n in Note, where: n.todo_id == ^todo_id, order_by: [desc: n.inserted_at])\
+    |> Repo.all()\
+  end\
+\
+  @doc """\
+  Gets a single note.\
+  """\
+  def get_note!(id), do: Repo.get!(Note, id)\
+\
+  @doc """\
+  Creates a note.\
+  """\
+  def create_note(attrs \\ %{}) do\
+    %Note{}\
+    |> Note.changeset(attrs)\
+    |> Repo.insert()\
+    |> case do\
+      {:ok, note} ->\
+        broadcast({:ok, note}, :note_created)\
+        {:ok, note}\
+      error ->\
+        error\
+    end\
+  end\
+\
+  @doc """\
+  Deletes a note.\
+  """\
+  def delete_note(%Note{} = note) do\
+    case Repo.delete(note) do\
+      {:ok, note} ->\
+        broadcast({:ok, note}, :note_deleted)\
+        {:ok, note}\
+      error ->\
+        error\
+    end\
+  end\
+\
+  @doc """\
+  Returns an `%Ecto.Changeset{}` for tracking note changes.\
+  """\
+  def change_note(%Note{} = note, attrs \\ %{}) do\
+    Note.changeset(note, attrs)\
+  end
   def reconstruct_title_with_hashtags(todo) do
     category_hashtags = Enum.map(todo.categories, fn category -> "##{category.name}" end)
     importance_hashtag = if todo.important, do: ["#imp"], else: []
