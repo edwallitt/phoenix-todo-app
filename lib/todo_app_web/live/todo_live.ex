@@ -3,7 +3,7 @@ defmodule TodoAppWeb.TodoLive do
   alias TodoApp.Todos
   alias TodoApp.Repo
   alias TodoApp.Todos
-  alias TodoApp.Repo.{Todo, Note}
+  alias TodoApp.Todos.{Todo, Note}
   alias Phoenix.LiveView.JS
 
   def mount(_params, _session, socket) do
