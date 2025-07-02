@@ -127,7 +127,7 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   def handle_event("filter_by_category", %{"category" => category}, socket) do
-    todos = Todos.list_todos(category)
+    todos = Todos.list_todos(category) |> Repo.preload([:categories, :notes])
 
     {:noreply,
      socket
