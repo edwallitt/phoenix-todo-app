@@ -1,9 +1,3 @@
-==> earmark
-Compiling 2 files (.xrl)
-Compiling 1 file (.yrl)
-Compiling 3 files (.erl)
-Compiling 61 files (.ex)
-Generated earmark app
 defmodule TodoApp.MixProject do
   use Mix.Project
 
