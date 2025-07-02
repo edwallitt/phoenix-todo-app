@@ -1,13 +1,15 @@
 defmodule TodoAppWeb.TodoLive do
   use TodoAppWeb, :live_view
   alias TodoApp.Todos
-  alias TodoApp.Todos.{Todo, Note}
+  alias TodoApp.Repo
+  alias TodoApp.Todos
+  alias TodoApp.Repo.{Todo, Note}
   alias Phoenix.LiveView.JS
 
   def mount(_params, _session, socket) do
     if connected?(socket), do: Phoenix.PubSub.subscribe(TodoApp.PubSub, "todos")
 
-    todos = Todos.list_todos()
+    todos = Todos.list_todos() |> Repo.preload(:notes)
     categories = Todos.list_categories()
 
     {:ok,
@@ -31,7 +33,7 @@ defmodule TodoAppWeb.TodoLive do
     case Todos.create_todo(todo_params) do
       {:ok, _todo} ->
         # Refresh todos and categories since new categories might be created
-        todos = apply_category_filter(socket.assigns.category_filter)
+        todos = apply_category_filter(socket.assigns.category_filter) |> Repo.preload(:notes)
         categories = Todos.list_categories()
 
         {:noreply,
@@ -49,7 +51,7 @@ defmodule TodoAppWeb.TodoLive do
     todo = Todos.get_todo!(id)
     {:ok, _updated_todo} = Todos.update_todo(todo, %{completed: !todo.completed})
 
-    todos = apply_category_filter(socket.assigns.category_filter)
+    todos = apply_category_filter(socket.assigns.category_filter) |> Repo.preload(:notes)
     {:noreply, assign(socket, :todos, todos)}
   end
 
@@ -58,7 +60,7 @@ defmodule TodoAppWeb.TodoLive do
     {:ok, _updated_todo} = Todos.update_todo(todo, %{important: !todo.important})
 
     # Re-fetch todos to get proper sorting (important first)
-    todos = apply_category_filter(socket.assigns.category_filter)
+    todos = apply_category_filter(socket.assigns.category_filter) |> Repo.preload(:notes)
     {:noreply, assign(socket, :todos, todos)}
   end
 
@@ -66,7 +68,7 @@ defmodule TodoAppWeb.TodoLive do
     todo = Todos.get_todo!(id)
     {:ok, _} = Todos.delete_todo(todo)
 
-    todos = apply_category_filter(socket.assigns.category_filter)
+    todos = apply_category_filter(socket.assigns.category_filter) |> Repo.preload(:notes)
     categories = Todos.list_categories()
 
     {:noreply,
@@ -93,7 +95,7 @@ defmodule TodoAppWeb.TodoLive do
 
     case Todos.update_todo_with_hashtags(todo, todo_params) do
       {:ok, _updated_todo} ->
-        todos = apply_category_filter(socket.assigns.category_filter)
+        todos = apply_category_filter(socket.assigns.category_filter) |> Repo.preload(:notes)
         categories = Todos.list_categories()
 
         {:noreply,
@@ -116,7 +118,7 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   def handle_event("filter_by_category", %{"category" => "all"}, socket) do
-    todos = Todos.list_todos()
+    todos = Todos.list_todos() |> Repo.preload(:notes)
 
     {:noreply,
      socket
@@ -203,7 +205,7 @@ defmodule TodoAppWeb.TodoLive do
 
   def handle_info({event, _data}, socket)
       when event in [:todo_created, :todo_updated, :todo_deleted] do
-    todos = apply_category_filter(socket.assigns.category_filter)
+    todos = apply_category_filter(socket.assigns.category_filter) |> Repo.preload(:notes)
     categories = Todos.list_categories()
 
     {:noreply,
