@@ -1,3 +1,9 @@
+==> earmark
+Compiling 2 files (.xrl)
+Compiling 1 file (.yrl)
+Compiling 3 files (.erl)
+Compiling 61 files (.ex)
+Generated earmark app
 defmodule TodoApp.MixProject do
   use Mix.Project
 
@@ -9,8 +15,7 @@ defmodule TodoApp.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps(),
-      listeners: [Phoenix.CodeReloader]
+      deps: deps()
     ]
   end
 
