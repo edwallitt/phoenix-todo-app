@@ -7,14 +7,6 @@ defmodule TodoApp.Todos do
   alias TodoApp.Repo
   alias TodoApp.Todos.{Todo, Category, TodoCategory}
 
-  # PubSub for real-time updates
-  defp broadcast({:ok, result}, event) do
-    Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {event, result})
-    {:ok, result}
-  end
-
-  defp broadcast({:error, _reason} = error, _event), do: error
-
   @doc """
   Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
   """
