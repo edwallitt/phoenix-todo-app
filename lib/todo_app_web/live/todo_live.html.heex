@@ -1,109 +1,112 @@
 <Layouts.app flash={@flash}>
   <div class="max-w-4xl mx-auto p-6">
-    <div class="text-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900 mb-2">Todo</h1>
-      <p class="text-gray-600">A clean, focused task management system</p>
-    </div>
-    
-<!-- Category Filter Buttons -->
-    <div class="mb-8">
-      <div class="flex flex-wrap gap-2">
-        <button
-          phx-click="filter_by_category"
-          phx-value-category="all"
-          class={"px-3 py-1 text-sm rounded-full font-medium transition-colors #{if @category_filter == nil, do: "bg-green-100 text-green-800 border border-green-200", else: "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"}"}
-        >
-          All
-        </button>
-        <%= for category <- @categories do %>
-          <button
-            phx-click="filter_by_category"
-            phx-value-category={category.slug}
-            class={"px-3 py-1 text-sm rounded-full font-medium transition-colors #{if @category_filter == category.slug, do: "bg-green-100 text-green-800 border border-green-200", else: "bg-gray-100 text-gray-700 border border-gray-200 hover:bg-gray-200"}"}
-          >
-            {category.name}
-          </button>
-        <% end %>
-      </div>
-      <.link href="/categories" class="text-sm text-green-600 hover:text-green-700 font-medium">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">My Todo List</h1>
+      <.link
+        navigate={~p"/categories"}
+        class="text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors"
+      >
         Manage Categories
       </.link>
     </div>
     
 <!-- Add Todo Form -->
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm mb-8 p-6">
-      <%= if @editing_todo_id do %>
-        <!-- Edit Form (hidden during edit) -->
-        <div class="opacity-50">
-          <div class="flex gap-3">
-            <div class="flex-1">
-              <input
-                type="text"
-                disabled
-                class="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-900 bg-gray-100 placeholder:text-gray-500"
-                placeholder="Editing todo above..."
-              />
-            </div>
-            <button
-              type="button"
-              disabled
-              class="px-6 py-3 bg-gray-400 text-white font-medium rounded-md cursor-not-allowed"
-            >
-              Add Task
-            </button>
-          </div>
+    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+      <.form
+        for={@form}
+        id="todo-form"
+        phx-submit="add_todo"
+        phx-change="validate"
+        class="flex gap-3"
+      >
+        <div class="flex-1">
+          <.input
+            field={@form[:title]}
+            type="text"
+            placeholder="Add a new todo... (use #hashtags to categorize)"
+            class="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-900 bg-white placeholder:text-gray-500 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors"
+            error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+          />
         </div>
-      <% else %>
-        <.form
-          for={@form}
-          phx-submit="add_todo"
-          phx-change="validate"
-          class="flex gap-3"
-          id="todo-form"
+        <button
+          type="submit"
+          class="px-6 py-3 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+          disabled={@form.source.valid? == false}
         >
-          <div class="flex-1">
-            <.input
-              field={@form[:title]}
-              type="text"
-              class="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-900 bg-white placeholder:text-gray-500 focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors"
-              placeholder="Add a new task... (use #hashtags for categories)"
-            />
-          </div>
-          <button
-            type="submit"
-            class="px-6 py-3 bg-green-600 text-white font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled={not @form.source.valid?}
-          >
-            Add Task
-          </button>
-        </.form>
-      <% end %>
-      <p class="text-sm text-gray-500 mt-2">
-        💡 Tip: Use hashtags like <code class="bg-gray-100 px-1 rounded text-xs">#work</code>
-        or <code class="bg-gray-100 px-1 rounded text-xs">#imp</code>
-        to mark as important
-        or <code class="bg-gray-100 px-1 rounded text-xs">#personal</code>
-        to automatically categorize your todos
-      </p>
+          Add Todo
+        </button>
+      </.form>
     </div>
     
-<!-- Todo List -->
-    <div class="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
-      <%= for todo <- @todos do %>
-        <div class="border-b border-gray-100 last:border-b-0">
-          <div class="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors">
+<!-- Category Filters -->
+    <%= if not Enum.empty?(@categories) do %>
+      <div class="mb-6">
+        <div class="flex flex-wrap gap-2">
+          <button
+            phx-click="filter_by_category"
+            phx-value-category="all"
+            class={[
+              "px-3 py-1 text-sm rounded-full border transition-colors",
+              if(@selected_category == nil,
+                do: "bg-green-100 text-green-800 border-green-300",
+                else: "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+              )
+            ]}
+          >
+            All
+          </button>
+          <%= for category <- @categories do %>
+            <button
+              phx-click="filter_by_category"
+              phx-value-category={category.slug}
+              class={[
+                "px-3 py-1 text-sm rounded-full border transition-colors",
+                if(@selected_category == category.slug,
+                  do: "bg-green-100 text-green-800 border-green-300",
+                  else: "bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200"
+                )
+              ]}
+            >
+              {category.name}
+            </button>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    
+<!-- Todos List -->
+    <div class="space-y-3">
+      <%= if Enum.empty?(@todos) do %>
+        <div class="text-center py-12">
+          <svg
+            class="w-16 h-16 text-gray-300 mx-auto mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            >
+            </path>
+          </svg>
+          <p class="text-gray-500 text-lg">No todos yet</p>
+          <p class="text-gray-400 text-sm">Add your first todo above to get started</p>
+        </div>
+      <% else %>
+        <%= for todo <- @todos do %>
+          <div class="bg-white rounded-lg border border-gray-200 p-4 flex items-center gap-4">
             <!-- Checkbox -->
             <button
               phx-click="toggle_todo"
               phx-value-id={todo.id}
-              class={"flex-shrink-0 w-5 h-5 rounded border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-green-200 focus:ring-offset-2 #{if todo.completed, do: "bg-green-500 border-green-500", else: "border-gray-300 hover:border-green-400"}"}
+              class="flex-shrink-0 w-5 h-5 rounded border-2 border-gray-300 flex items-center justify-center hover:border-green-500 transition-colors"
             >
               <%= if todo.completed do %>
-                <svg
-                  class="w-3 h-3 text-white mx-auto mt-0.5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
+                <svg class="w-3 h-3 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                   <path
                     fill-rule="evenodd"
                     d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -114,212 +117,141 @@
               <% end %>
             </button>
             
-<!-- Important Icon -->
-            <button
-              phx-click="toggle_important"
-              phx-value-id={todo.id}
-              class={"flex-shrink-0 w-5 h-5 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-200 focus:ring-offset-2 #{if todo.important, do: "text-orange-500 hover:text-orange-600", else: "text-gray-300 hover:text-orange-400"}"}
-            >
-              <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
-                </path>
-              </svg>
-            </button>
-            
-<!-- Todo Text and Categories OR Edit Form -->
+<!-- Todo Content -->
             <div class="flex-1 min-w-0">
-              <%= if @editing_todo_id == todo.id do %>
-                <!-- Edit Form -->
-                <.form for={@form} phx-submit="save_edit" phx-change="validate" class="flex gap-2">
-                  <div class="flex-1">
-                    <.input
-                      field={@form[:title]}
-                      type="text"
-                      class="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200 transition-colors"
-                    />
-                  </div>
+              <%= if @editing_todo && @editing_todo.id == todo.id do %>
+                <!-- Edit Mode -->
+                <form phx-submit="save_edit" phx-value-id={todo.id} class="flex gap-2">
+                  <input
+                    type="text"
+                    value={todo.title}
+                    name="title"
+                    class="flex-1 px-3 py-1 border border-gray-300 rounded-md text-gray-900 bg-white focus:border-green-500 focus:ring-2 focus:ring-green-200"
+                    autofocus
+                  />
                   <button
                     type="submit"
-                    class="px-3 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 transition-colors"
+                    class="px-3 py-1 bg-green-600 text-white text-sm rounded-md hover:bg-green-700"
                   >
                     Save
                   </button>
                   <button
                     type="button"
                     phx-click="cancel_edit"
-                    class="px-3 py-2 bg-gray-500 text-white text-sm font-medium rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-colors"
+                    class="px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded-md hover:bg-gray-400"
                   >
                     Cancel
                   </button>
-                </.form>
+                </form>
               <% else %>
                 <!-- View Mode -->
-                <div phx-click="start_edit" phx-value-id={todo.id} class="cursor-pointer">
-                  <p class={"text-sm font-medium transition-colors mb-1 #{if todo.completed, do: "line-through text-gray-500", else: "text-gray-900"}"}>
+                <div class="flex items-center gap-2">
+                  <span
+                    phx-click="start_edit"
+                    phx-value-id={todo.id}
+                    class={[
+                      "flex-1 cursor-pointer",
+                      if(todo.completed, do: "line-through text-gray-500", else: "text-gray-900")
+                    ]}
+                  >
                     {todo.title}
-                  </p>
-                  <%= if not Enum.empty?(todo.categories) do %>
-                    <div class="flex flex-wrap gap-1">
-                      <%= for category <- todo.categories do %>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                          #{category.name}
-                        </span>
-                      <% end %>
-                    </div>
+                  </span>
+                  <%= for category <- todo.categories do %>
+                    <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                      #{category.name}
+                    </span>
                   <% end %>
                 </div>
               <% end %>
             </div>
             
+<!-- Action Buttons -->
+            <div class="flex items-center gap-2">
+              <!-- Importance Toggle -->
+              <button
+                phx-click="toggle_importance"
+                phx-value-id={todo.id}
+                class={[
+                  "p-2 rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-orange-200",
+                  if(todo.important,
+                    do: "text-orange-500 hover:text-orange-600",
+                    else: "text-gray-400 hover:text-orange-500"
+                  )
+                ]}
+                title={if(todo.important, do: "Remove importance", else: "Mark as important")}
+              >
+                <%= if todo.important do %>
+                  <!-- Filled Star -->
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z">
+                    </path>
+                  </svg>
+                <% else %>
+                  <!-- Outline Star -->
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"
+                    >
+                    </path>
+                  </svg>
+                <% end %>
+              </button>
+              
 <!-- Notes Button -->
-<!-- Notes Button -->
-            <button
-              phx-click="show_notes"
-              phx-value-id={todo.id}
-              class="flex-shrink-0 p-2 text-gray-400 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2 rounded transition-colors"
-              title="View notes"
-            >
-              <%= if Enum.empty?(todo.notes) do %>
-                <!-- Outline icon when no notes -->
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <.link
+                navigate={~p"/todos/#{todo.id}/notes"}
+                class="p-2 text-gray-400 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2 rounded transition-colors"
+                title="View notes"
+              >
+                <%= if Enum.empty?(todo.notes) do %>
+                  <!-- Outline Icon when no notes -->
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    >
+                    </path>
+                  </svg>
+                <% else %>
+                  <!-- Filled Icon when notes exist -->
+                  <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path
+                      fill-rule="evenodd"
+                      d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
+                      clip-rule="evenodd"
+                    >
+                    </path>
+                  </svg>
+                <% end %>
+              </.link>
+              
+<!-- Delete Button -->
+              <button
+                phx-click="delete_todo"
+                phx-value-id={todo.id}
+                data-confirm="Are you sure you want to delete this todo?"
+                class="p-2 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 rounded transition-colors"
+                title="Delete todo"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                   >
                   </path>
                 </svg>
-              <% else %>
-                <!-- Filled icon when notes exist -->
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                  <path
-                    fill-rule="evenodd"
-                    d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 00-2 2v6a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2 1 1 0 100-2 2 2 0 012 2v8a4 4 0 01-4 4H6a4 4 0 01-4-4V7a2 2 0 012-2z"
-                    clip-rule="evenodd"
-                  />
-                </svg>
-              <% end %>
-            </button>
-            
-<!-- Delete Button -->
-            <button
-              phx-click="delete_todo"
-              phx-value-id={todo.id}
-              class="flex-shrink-0 p-2 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 rounded transition-colors"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                >
-                </path>
-              </svg>
-            </button>
-          </div>
-          
-<!-- Notes Section -->
-          <%= if @selected_todo_id == todo.id do %>
-            <div
-              id={"notes-#{todo.id}"}
-              class="notes-section bg-gray-50 border-t border-gray-200 p-4"
-            >
-              <div class="flex items-center justify-between mb-3">
-                <h4 class="text-sm font-medium text-gray-900">Notes</h4>
-                <button phx-click="hide_notes" class="text-xs text-gray-500 hover:text-gray-700">
-                  Hide
-                </button>
-              </div>
-              
-<!-- Add Note Form -->
-              <.form
-                for={@note_form}
-                phx-submit="add_note"
-                phx-change="validate_note"
-                class="mb-4"
-              >
-                <div class="flex gap-2">
-                  <div class="flex-1">
-                    <.input
-                      field={@note_form[:content]}
-                      type="text"
-                      class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md text-gray-900 bg-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
-                      placeholder="Add a note... (Markdown supported)"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    class="px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                  >
-                    Add
-                  </button>
-                </div>
-              </.form>
-              
-<!-- Notes List -->
-              <%= if Enum.empty?(@notes) do %>
-                <p class="text-sm text-gray-500 italic">No notes yet</p>
-              <% else %>
-                <div class="space-y-3">
-                  <%= for note <- @notes do %>
-                    <div class="bg-white rounded border border-gray-200 p-3">
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1 prose prose-sm max-w-none">
-                          {raw(TodoApp.Todos.Note.render_html(note))}
-                        </div>
-                        <button
-                          phx-click="delete_note"
-                          phx-value-id={note.id}
-                          class="ml-2 p-1 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 rounded transition-colors"
-                        >
-                          <svg
-                            class="w-3 h-3"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M6 18L18 6M6 6l12 12"
-                            >
-                            </path>
-                          </svg>
-                        </button>
-                      </div>
-                      <div class="mt-2 text-xs text-gray-500">
-                        {Calendar.strftime(note.inserted_at, "%B %d, %Y at %I:%M %p")}
-                      </div>
-                    </div>
-                  <% end %>
-                </div>
-              <% end %>
+              </button>
             </div>
-          <% end %>
-        </div>
+          </div>
+        <% end %>
       <% end %>
     </div>
-
-    <%= if Enum.empty?(@todos) do %>
-      <div class="text-center py-12">
-        <div class="text-gray-400 mb-4">
-          <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="1"
-              d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-            >
-            </path>
-          </svg>
-        </div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">No todos yet</h3>
-        <p class="text-gray-500">Add your first task above to get started!</p>
-      </div>
-    <% end %>
   </div>
 </Layouts.app>
