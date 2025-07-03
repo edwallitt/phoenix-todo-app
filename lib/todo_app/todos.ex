@@ -175,12 +175,12 @@ defmodule TodoApp.Todos do
   @doc """
   Returns the list of notes for a todo.
   """
-  @doc """\
-  Preloads notes for todos.\
-  """\
-  def preload_notes(todos) do\
-    Repo.preload(todos, :notes)\
-  end\
+  @doc """
+  Preloads notes for todos.
+  """
+  def preload_notes(todos) do
+    Repo.preload(todos, :notes)
+  end
 
   def list_notes_for_todo(todo_id) do
     from(n in Note, where: n.todo_id == ^todo_id, order_by: [desc: n.inserted_at])
