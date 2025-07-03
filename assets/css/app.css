@@ -50,186 +50,186 @@
 }
 
 /* Comprehensive Markdown Styling */
-.prose {
+.notes-content {
   @apply text-gray-700 leading-relaxed;
 }
 
-.prose h1 {
+.notes-content h1 {
   @apply text-2xl font-bold text-gray-900 mb-4 mt-6 first:mt-0;
   border-bottom: 2px solid #e5e7eb;
   padding-bottom: 0.5rem;
 }
 
-.prose h2 {
+.notes-content h2 {
   @apply text-xl font-bold text-gray-900 mb-3 mt-5 first:mt-0;
   border-bottom: 1px solid #e5e7eb;
   padding-bottom: 0.25rem;
 }
 
-.prose h3 {
+.notes-content h3 {
   @apply text-lg font-bold text-gray-900 mb-3 mt-4 first:mt-0;
 }
 
-.prose h4 {
+.notes-content h4 {
   @apply text-base font-bold text-gray-900 mb-2 mt-4 first:mt-0;
 }
 
-.prose h5 {
+.notes-content h5 {
   @apply text-sm font-bold text-gray-900 mb-2 mt-3 first:mt-0;
 }
 
-.prose h6 {
+.notes-content h6 {
   @apply text-sm font-bold text-gray-600 mb-2 mt-3 first:mt-0;
 }
 
-.prose p {
+.notes-content p {
   @apply mb-4 first:mt-0 last:mb-0;
 }
 
-.prose strong {
+.notes-content strong {
   @apply font-bold text-gray-900;
 }
 
-.prose em {
+.notes-content em {
   @apply italic text-gray-700;
 }
 
-.prose ul {
+.notes-content ul {
   @apply list-disc list-inside mb-4 pl-4 space-y-1;
 }
 
-.prose ol {
+.notes-content ol {
   @apply list-decimal list-inside mb-4 pl-4 space-y-1;
 }
 
-.prose li {
+.notes-content li {
   @apply text-gray-700;
 }
 
-.prose ul ul,
-.prose ol ol,
-.prose ul ol,
-.prose ol ul {
+.notes-content ul ul,
+.notes-content ol ol,
+.notes-content ul ol,
+.notes-content ol ul {
   @apply mt-1 mb-1 ml-4;
 }
 
-.prose blockquote {
+.notes-content blockquote {
   @apply border-l-4 border-blue-300 pl-4 py-2 mb-4 bg-blue-50 text-gray-700 italic;
 }
 
-.prose blockquote p {
+.notes-content blockquote p {
   @apply mb-2 last:mb-0;
 }
 
-.prose code {
+.notes-content code {
   @apply bg-gray-100 text-gray-800 px-2 py-1 rounded text-sm font-mono;
 }
 
-.prose pre {
+.notes-content pre {
   @apply bg-gray-900 text-gray-100 p-4 rounded-lg mb-4 overflow-x-auto;
 }
 
-.prose pre code {
+.notes-content pre code {
   @apply bg-transparent text-gray-100 p-0 rounded-none;
 }
 
-.prose a {
+.notes-content a {
   @apply text-blue-600 hover:text-blue-800 underline;
 }
 
-.prose hr {
+.notes-content hr {
   @apply border-0 border-t border-gray-300 my-6;
 }
 
-.prose table {
+.notes-content table {
   @apply w-full border-collapse border border-gray-300 mb-4;
 }
 
-.prose th {
+.notes-content th {
   @apply bg-gray-100 border border-gray-300 px-4 py-2 text-left font-semibold;
 }
 
-.prose td {
+.notes-content td {
   @apply border border-gray-300 px-4 py-2;
 }
 
 /* Code syntax highlighting classes for various languages */
-.prose .language-elixir {
+.notes-content .language-elixir {
   @apply text-purple-300;
 }
 
-.prose .language-javascript {
+.notes-content .language-javascript {
   @apply text-yellow-300;
 }
 
-.prose .language-html {
+.notes-content .language-html {
   @apply text-red-300;
 }
 
-.prose .language-css {
+.notes-content .language-css {
   @apply text-blue-300;
 }
 
-.prose .language-bash {
+.notes-content .language-bash {
   @apply text-green-300;
 }
 
-.prose .language-json {
+.notes-content .language-json {
   @apply text-orange-300;
 }
 
 /* Improve nested list styling */
-.prose ul li ul,
-.prose ol li ol,
-.prose ul li ol,
-.prose ol li ul {
+.notes-content ul li ul,
+.notes-content ol li ol,
+.notes-content ul li ol,
+.notes-content ol li ul {
   @apply mt-1 mb-0;
 }
 
-.prose ul li ul li,
-.prose ol li ol li,
-.prose ul li ol li,
-.prose ol li ul li {
+.notes-content ul li ul li,
+.notes-content ol li ol li,
+.notes-content ul li ol li,
+.notes-content ol li ul li {
   @apply text-gray-600;
 }
 
 /* Better spacing for mixed content */
-.prose > *:first-child {
+.notes-content > *:first-child {
   @apply mt-0;
 }
 
-.prose > *:last-child {
+.notes-content > *:last-child {
   @apply mb-0;
 }
 
 /* Enhanced blockquote styling */
-.prose blockquote strong {
+.notes-content blockquote strong {
   @apply text-blue-900;
 }
 
-.prose blockquote em {
+.notes-content blockquote em {
   @apply text-blue-700;
 }
 
 /* Responsive adjustments */
 @media (max-width: 640px) {
-  .prose {
+  .notes-content {
     @apply text-sm;
   }
 
-  .prose h1 {
+  .notes-content h1 {
     @apply text-xl;
   }
 
-  .prose h2 {
+  .notes-content h2 {
     @apply text-lg;
   }
 
-  .prose h3 {
+  .notes-content h3 {
     @apply text-base;
   }
 
-  .prose pre {
+  .notes-content pre {
     @apply text-xs;
   }
 }
