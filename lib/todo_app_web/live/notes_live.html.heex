@@ -1,0 +1,115 @@
+<Layouts.app flash={@flash}>
+  <div class="max-w-4xl mx-auto p-6">
+    <!-- Header with Back Button -->
+    <div class="flex items-center gap-4 mb-6">
+      <.link
+        navigate={~p"/"}
+        class="p-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:ring-offset-2 rounded transition-colors"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          >
+          </path>
+        </svg>
+      </.link>
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900">Notes</h1>
+        <p class="text-gray-600">{@todo.title}</p>
+      </div>
+    </div>
+    
+<!-- Add Note Form -->
+    <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Add a Note</h2>
+      <.form
+        for={@form}
+        id="note-form"
+        phx-submit="add_note"
+        phx-change="validate"
+        class="space-y-4"
+      >
+        <div>
+          <.input
+            field={@form[:content]}
+            type="textarea"
+            placeholder="Add a note... (Markdown supported)"
+            rows="4"
+            class="w-full px-4 py-3 border border-gray-300 rounded-md text-gray-900 bg-white placeholder:text-gray-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors resize-vertical"
+            error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
+          />
+        </div>
+        <div class="flex justify-end">
+          <button
+            type="submit"
+            class="px-6 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50"
+            disabled={@form.source.valid? == false}
+          >
+            Add Note
+          </button>
+        </div>
+      </.form>
+    </div>
+    
+<!-- Notes List -->
+    <div class="space-y-4">
+      <%= if Enum.empty?(@notes) do %>
+        <div class="text-center py-12">
+          <svg
+            class="w-16 h-16 text-gray-300 mx-auto mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+            >
+            </path>
+          </svg>
+          <p class="text-gray-500 text-lg">No notes yet</p>
+          <p class="text-gray-400 text-sm">Add your first note above to get started</p>
+        </div>
+      <% else %>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">
+          Notes ({length(@notes)})
+        </h2>
+
+        <%= for note <- @notes do %>
+          <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <div class="flex justify-between items-start mb-3">
+              <div class="text-sm text-gray-500">
+                {format_date(note.inserted_at)}
+              </div>
+              <button
+                phx-click="delete_note"
+                phx-value-id={note.id}
+                data-confirm="Are you sure you want to delete this note?"
+                class="p-1 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 rounded transition-colors"
+                title="Delete note"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                  >
+                  </path>
+                </svg>
+              </button>
+            </div>
+            <div class="prose prose-sm max-w-none text-gray-700">
+              {raw(Earmark.as_html!(note.content))}
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+</Layouts.app>
