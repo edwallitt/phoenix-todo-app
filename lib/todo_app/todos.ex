@@ -149,7 +149,7 @@ defmodule TodoApp.Todos do
         |> Repo.all()
 
       # Delete all notes associated with this todo\
-      from(n in Note, where: n.todo_id == ^todo.id) |> Repo.delete_all()
+      from(n in TodoApp.Todos.Note, where: n.todo_id == ^todo.id) |> Repo.delete_all()
 
       # Delete the todo (this will also delete join table entries if we had foreign key constraints)
       case Repo.delete(todo) do
