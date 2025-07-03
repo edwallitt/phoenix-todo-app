@@ -182,12 +182,6 @@ defmodule TodoApp.Todos do
 
   alias TodoApp.Todos.Note
 
-  @doc """
-  Returns the list of notes for a todo.
-  """
-  @doc """
-  Preloads notes for todos.
-  """
   def preload_notes(todos) do
     Repo.preload(todos, :notes)
   end
