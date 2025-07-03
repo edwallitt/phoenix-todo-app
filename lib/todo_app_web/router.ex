@@ -18,6 +18,7 @@ defmodule TodoAppWeb.Router do
     pipe_through :browser
 
     live "/", TodoLive
+    live "/todos/:id/notes", NotesLive
     live "/categories", CategoryLive
   end
 
