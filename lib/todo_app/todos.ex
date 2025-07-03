@@ -200,15 +200,18 @@ defmodule TodoApp.Todos do
   def get_note!(id), do: Repo.get!(Note, id)
 
   @doc """
-  Creates a note.
+  Creates a note for a specific todo.
   """
-  def create_note(attrs \\ %{}) do
+  def create_note(todo, attrs \\ %{}) do
+    attrs_with_todo_id = Map.put(attrs, "todo_id", todo.id)
+
     %Note{}
-    |> Note.changeset(attrs)
+    |> Note.changeset(attrs_with_todo_id)
     |> Repo.insert()
     |> case do
       {:ok, note} ->
-        broadcast({:ok, note}, :note_created)
+        Phoenix.PubSub.broadcast(TodoApp.PubSub, "notes:#{todo.id}", {:note_created, note})
+        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:note_created, note})
         {:ok, note}
 
       error ->
@@ -222,7 +225,8 @@ defmodule TodoApp.Todos do
   def delete_note(%Note{} = note) do
     case Repo.delete(note) do
       {:ok, note} ->
-        broadcast({:ok, note}, :note_deleted)
+        Phoenix.PubSub.broadcast(TodoApp.PubSub, "notes:#{note.todo_id}", {:note_deleted, note})
+        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:note_deleted, note})
         {:ok, note}
 
       error ->
@@ -286,6 +290,22 @@ defmodule TodoApp.Todos do
   end
 
   @doc """
+  Returns todos filtered by category slug.
+  """
+  def list_todos_by_category(category_slug) do
+    from(t in Todo,
+      join: tc in TodoCategory,
+      on: tc.todo_id == t.id,
+      join: c in Category,
+      on: c.id == tc.category_id,
+      where: c.slug == ^category_slug,
+      preload: [:categories],
+      order_by: [desc: t.important, desc: t.inserted_at]
+    )
+    |> Repo.all()
+  end
+
+  @doc """
   Finds or creates categories and associates them with a todo.
   """
   def associate_todo_with_categories(todo, categories_or_names) do
@@ -335,6 +355,6 @@ defmodule TodoApp.Todos do
     string
     |> String.downcase()
     |> String.replace(~r/[^a-z0-9\s]/, "")
-    |> String.replace(~r/\s+/, "_")
+    |> String.replace(~r/\s+/, " ")
   end
 end
