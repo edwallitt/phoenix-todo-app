@@ -17,8 +17,7 @@
         </svg>
       </.link>
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Notes</h1>
-        <p class="text-gray-600">{@todo.title}</p>
+        <h1 class="text-2xl font-bold text-gray-900">{@todo.title}</h1>
       </div>
     </div>
     
@@ -88,7 +87,6 @@
               <button
                 phx-click="delete_note"
                 phx-value-id={note.id}
-                data-confirm="Are you sure you want to delete this note?"
                 class="p-1 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 rounded transition-colors"
                 title="Delete note"
               >
@@ -104,7 +102,16 @@
               </button>
             </div>
             <div class="prose prose-sm max-w-none text-gray-700">
-              {raw(Earmark.as_html!(note.content))}
+              {raw(
+                Earmark.as_html!(note.content, %Earmark.Options{
+                  code_class_prefix: "language-",
+                  footnotes: true,
+                  footnote_offset: 1,
+                  gfm: true,
+                  breaks: true,
+                  smartypants: true
+                })
+              )}
             </div>
           </div>
         <% end %>
