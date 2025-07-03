@@ -21,7 +21,7 @@ defmodule TodoAppWeb.NotesLive do
 
   def handle_event("add_note", %{"note" => note_params}, socket) do
     case Todos.create_note(socket.assigns.todo, note_params) do
-      {:ok, note} ->
+      {:ok, _note} ->
         {:noreply,
          socket
          |> assign(:form, to_form(%{"content" => ""}, as: :note))
