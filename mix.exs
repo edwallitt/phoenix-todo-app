@@ -19,6 +19,7 @@ defmodule TodoApp.MixProject do
   def application do
     [
       mod: {TodoApp.Application, []},
+      listeners: [],
       extra_applications: [:logger, :runtime_tools]
     ]
   end
