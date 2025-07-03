@@ -148,6 +148,9 @@ defmodule TodoApp.Todos do
         from(tc in TodoCategory, where: tc.todo_id == ^todo.id, select: tc.category_id)
         |> Repo.all()
 
+      # Delete all notes associated with this todo\
+      from(n in Note, where: n.todo_id == ^todo.id) |> Repo.delete_all()
+
       # Delete the todo (this will also delete join table entries if we had foreign key constraints)
       case Repo.delete(todo) do
         {:ok, deleted_todo} ->
