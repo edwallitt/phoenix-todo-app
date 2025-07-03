@@ -69,6 +69,13 @@ defmodule TodoApp.Todos do
   def get_todo!(id), do: Repo.get!(Todo, id) |> Repo.preload(:categories)
 
   @doc """
+  Gets a single todo with notes preloaded.
+  """
+  def get_todo_with_notes!(id) do
+    get_todo!(id) |> Repo.preload(:notes)
+  end
+
+  @doc """
   Creates a todo with hashtag parsing for categories.
   """
   def create_todo(attrs \\ %{}) do
