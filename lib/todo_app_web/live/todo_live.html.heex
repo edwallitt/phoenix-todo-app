@@ -2,7 +2,7 @@
   <div class="max-w-4xl mx-auto p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-3xl font-bold text-gray-900">My Todo List</h1>
+      <h1 class="text-3xl font-bold text-gray-900">Ed's Todo List</h1>
       <.link
         navigate={~p"/categories"}
         class="text-sm text-gray-600 hover:text-gray-800 font-medium transition-colors"
@@ -233,7 +233,6 @@
               <button
                 phx-click="delete_todo"
                 phx-value-id={todo.id}
-                data-confirm="Are you sure you want to delete this todo?"
                 class="p-2 text-gray-400 hover:text-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 focus:ring-offset-2 rounded transition-colors"
                 title="Delete todo"
               >
