@@ -59,7 +59,8 @@ defmodule TodoApp.MixProject do
       {:dns_cluster, "~> 0.1.1"},
       {:bandit, "~> 1.5"},
       {:earmark, "~> 1.4"}
-    ]
+      {:ecto_sqlite3, "~> 0.17"},
+]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.
