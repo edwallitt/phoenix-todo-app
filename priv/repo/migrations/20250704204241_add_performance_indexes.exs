@@ -8,7 +8,9 @@ defmodule TodoApp.Repo.Migrations.AddPerformanceIndexes do
 
     # Index for category slug lookups (very common in filtering)
     # Optimizes: WHERE c.slug = ?
-    create index(:categories, [:slug]) unless index_exists?(:categories, [:slug])
+    unless index_exists?(:categories, [:slug]) do
+      create index(:categories, [:slug])
+    end
 
     # Composite index for todo-category joins with category filtering
     # Optimizes: JOIN todo_categories ON todo_id AND category_id
@@ -24,15 +26,22 @@ defmodule TodoApp.Repo.Migrations.AddPerformanceIndexes do
 
     # Composite index for category todo counts
     # Optimizes: COUNT(*) WHERE category_id = ?
-    create index(:todo_categories, [:category_id]) unless index_exists?(:todo_categories, [:category_id])
+    unless index_exists?(:todo_categories, [:category_id]) do
+      create index(:todo_categories, [:category_id])
+    end
 
     # Index for orphaned category cleanup queries
     # Optimizes: Finding categories with no todos
-    create index(:todo_categories, [:todo_id]) unless index_exists?(:todo_categories, [:todo_id])
+    unless index_exists?(:todo_categories, [:todo_id]) do
+      create index(:todo_categories, [:todo_id])
+    end
 
     # Partial index for important todos only (space efficient)
     # Optimizes: WHERE important = true
-    create index(:todos, [:inserted_at], where: "important = true", name: :todos_important_inserted_at_idx)
+    create index(:todos, [:inserted_at],
+             where: "important = true",
+             name: :todos_important_inserted_at_idx
+           )
 
     # Index for recent notes queries
     create index(:notes, [:inserted_at])
