@@ -10,5 +10,4 @@ defmodule TodoApp.Todos do
   alias TodoApp.Todos.Category
   alias TodoApp.Todos.TodoCategory
   alias TodoApp.Todos.Note
-
-
+end
