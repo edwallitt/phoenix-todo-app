@@ -38,7 +38,7 @@ defmodule TodoAppWeb.TodoComponents do
               <.icon name="hero-check" class="w-3 h-3" />
             <% end %>
           </button>
-          
+
     <!-- Todo Content -->
           <div class="flex-1">
             <%= if @editing && @editing.id == @todo.id do %>
@@ -80,7 +80,7 @@ defmodule TodoAppWeb.TodoComponents do
                 ]}>
                   {@todo.title}
                 </span>
-                
+
     <!-- Categories -->
                 <%= if length(@todo.categories) > 0 do %>
                   <div class="flex flex-wrap gap-1">
@@ -89,7 +89,7 @@ defmodule TodoAppWeb.TodoComponents do
                     <% end %>
                   </div>
                 <% end %>
-                
+
     <!-- Notes Count -->
                 <%= if length(@todo.notes) > 0 do %>
                   <span class="inline-flex items-center px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
@@ -101,7 +101,7 @@ defmodule TodoAppWeb.TodoComponents do
             <% end %>
           </div>
         </div>
-        
+
     <!-- Action Buttons -->
         <%= if !@editing || @editing.id != @todo.id do %>
           <div class="flex items-center space-x-2">
@@ -128,7 +128,7 @@ defmodule TodoAppWeb.TodoComponents do
                 }
               />
             </button>
-            
+
     <!-- Edit Button -->
             <button
               phx-click={@on_start_edit}
@@ -138,7 +138,7 @@ defmodule TodoAppWeb.TodoComponents do
             >
               <.icon name="hero-pencil" class="w-4 h-4" />
             </button>
-            
+
     <!-- Notes Button -->
             <.link
               navigate={"/todos/#{@todo.id}/notes"}
@@ -147,12 +147,11 @@ defmodule TodoAppWeb.TodoComponents do
             >
               <.icon name="hero-document-text" class="w-4 h-4" />
             </.link>
-            
+
     <!-- Delete Button -->
             <button
               phx-click={@on_delete}
               phx-value-id={@todo.id}
-              data-confirm="Are you sure you want to delete this todo?"
               class="p-1 text-gray-400 hover:text-red-500 transition-colors duration-200"
               title="Delete todo"
             >
