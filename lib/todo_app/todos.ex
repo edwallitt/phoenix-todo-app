@@ -73,6 +73,9 @@ defmodule TodoApp.Todos do
           # Process hashtags and create categories
           process_hashtags(todo, hashtags)
 
+          # Broadcast the creation
+          Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_created, todo})
+
           # Return todo with preloaded categories
           get_todo!(todo.id)
 
@@ -101,6 +104,9 @@ defmodule TodoApp.Todos do
           clear_todo_categories(updated_todo)
           process_hashtags(updated_todo, hashtags)
 
+          # Broadcast the update
+          Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_updated, updated_todo})
+
           # Return updated todo with preloaded categories
           get_todo!(updated_todo.id)
 
@@ -123,6 +129,10 @@ defmodule TodoApp.Todos do
         {:ok, deleted_todo} ->
           # Clean up orphaned categories
           cleanup_orphaned_categories(category_ids)
+
+          # Broadcast the deletion
+          Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:todo_deleted, deleted_todo})
+
           deleted_todo
 
         {:error, changeset} ->
@@ -137,7 +147,7 @@ defmodule TodoApp.Todos do
     # Match hashtags (# followed by word characters)
     hashtags =
       Regex.scan(~r/#\w+/, title)
-      |> Enum.map(fn [hashtag] -> String.slice(hashtag, 1..-1) end)
+      |> Enum.map(fn [hashtag] -> String.slice(hashtag, 1..-1//1) end)
       |> Enum.uniq()
 
     # Remove hashtags from title
@@ -202,7 +212,7 @@ defmodule TodoApp.Todos do
     end
   end
 
-  # Category functions remain the same but with optimized queries
+  # Category functions with optimized queries
 
   @doc """
   Returns the list of categories ordered by usage.
@@ -213,6 +223,14 @@ defmodule TodoApp.Todos do
     |> group_by([c], c.id)
     |> order_by([c], desc: count(), asc: c.name)
     |> Repo.all()
+  end
+
+  @doc """
+  Gets the count of todos for a specific category.
+  """
+  def get_category_todo_count(category_id) do
+    from(tc in TodoCategory, where: tc.category_id == ^category_id)
+    |> Repo.aggregate(:count, :id)
   end
 
   @doc """
@@ -270,7 +288,26 @@ defmodule TodoApp.Todos do
   def get_note!(id), do: Repo.get!(Note, id)
 
   @doc """
-  Creates a note.
+  Creates a note for a specific todo.
+  """
+  def create_note(%Todo{} = todo, attrs \\ %{}) do
+    attrs_with_todo = Map.put(attrs, "todo_id", todo.id)
+
+    case %Note{}
+         |> Note.changeset(attrs_with_todo)
+         |> Repo.insert() do
+      {:ok, note} ->
+        # Broadcast the note creation
+        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:note_created, note})
+        {:ok, note}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
+  end
+
+  @doc """
+  Creates a note with basic attributes.
   """
   def create_note(attrs \\ %{}) do
     %Note{}
@@ -291,7 +328,15 @@ defmodule TodoApp.Todos do
   Deletes a note.
   """
   def delete_note(%Note{} = note) do
-    Repo.delete(note)
+    case Repo.delete(note) do
+      {:ok, deleted_note} ->
+        # Broadcast the note deletion
+        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:note_deleted, deleted_note})
+        {:ok, deleted_note}
+
+      {:error, changeset} ->
+        {:error, changeset}
+    end
   end
 
   @doc """
