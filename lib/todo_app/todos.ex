@@ -21,7 +21,8 @@ defmodule TodoApp.Todos do
 
   """
   def list_todos do
-    Repo.all(Todo)
+    from(t in Todo, order_by: [desc: t.important, desc: t.inserted_at])
+    |> Repo.all()
     |> Repo.preload([:categories, :notes])
   end
 
@@ -43,6 +44,7 @@ defmodule TodoApp.Todos do
       where: c.name == ^category_name,
       preload: [:categories, :notes]
     )
+    |> order_by(desc: :important, desc: :inserted_at)
     |> Repo.all()
   end
 
