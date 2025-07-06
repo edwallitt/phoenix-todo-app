@@ -10,9 +10,9 @@ defmodule TodoAppWeb.TodoLiveTest do
     test "displays empty state when no todos exist", %{conn: conn} do
       {:ok, _view, html} = live(conn, ~p"/")
 
-      assert html =~ "Clinical Todo"
-      assert html =~ "A clean, focused task management system"
-      assert html =~ "Add a new task"
+      assert html =~ "Ed's Todo List"
+      assert html =~ "Ed's Todo List"
+      assert html =~ "Add New Todo"
     end
 
     test "displays existing todos with categories", %{conn: conn} do
@@ -251,7 +251,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       html = render(view)
       # The add todo form should be hidden during edit mode
-      refute html =~ "Add a new task... (use #hashtags for categories)"
+      refute html =~ "Add New Todo... (use #hashtags for categories)"
     end
 
     test "shows add todo form after editing complete", %{conn: conn} do
