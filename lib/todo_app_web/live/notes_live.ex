@@ -6,7 +6,7 @@ defmodule TodoAppWeb.NotesLive do
 
   def mount(%{"id" => todo_id}, _session, socket) do
     if connected?(socket) do
-      Phoenix.PubSub.subscribe(TodoApp.PubSub, "notes:#{todo_id}")
+      Phoenix.PubSub.subscribe(TodoApp.PubSub, "todos")
     end
 
     todo = Todos.get_todo_with_notes!(todo_id)
@@ -22,8 +22,11 @@ defmodule TodoAppWeb.NotesLive do
   def handle_event("add_note", %{"note" => note_params}, socket) do
     case Todos.create_note(socket.assigns.todo, note_params) do
       {:ok, _note} ->
+        notes = Todos.list_notes_for_todo(socket.assigns.todo.id)
+
         {:noreply,
          socket
+         |> assign(:notes, notes)
          |> assign(:form, to_form(%{"content" => ""}, as: :note))
          |> put_flash(:info, "Note added successfully")}
 
@@ -69,6 +72,10 @@ defmodule TodoAppWeb.NotesLive do
       {:noreply, socket}
     end
   end
+
+  def handle_info({:todo_created, _todo}, socket), do: {:noreply, socket}
+  def handle_info({:todo_updated, _todo}, socket), do: {:noreply, socket}
+  def handle_info({:todo_deleted, _todo}, socket), do: {:noreply, socket}
 
   defp format_date(datetime) do
     datetime
