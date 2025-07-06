@@ -10,9 +10,9 @@ defmodule TodoAppWeb.TodoLiveTest do
     test "displays empty state when no todos exist", %{conn: conn} do
       {:ok, _view, html} = live(conn, ~p"/")
 
-      assert html =~ "Ed&#39;s Todo List"
-      assert html =~ "Ed&#39;s Todo List"
-      assert html =~ "Add New Todo"
+      assert _html =~ "Ed&#39;s Todo List"
+      assert _html =~ "Ed&#39;s Todo List"
+      assert _html =~ "Add New Todo"
     end
 
     test "displays existing todos with categories", %{conn: conn} do
@@ -22,8 +22,8 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       {:ok, _view, html} = live(conn, ~p"/")
 
-      assert html =~ "Buy groceries"
-      assert html =~ "#shopping"
+      assert _html =~ "Buy groceries"
+      assert _html =~ "#shopping"
     end
 
     test "displays category filter buttons", %{conn: conn} do
@@ -33,8 +33,8 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       {:ok, _view, html} = live(conn, ~p"/")
 
-      assert html =~ "All"
-      assert html =~ "chores"
+      assert _html =~ "All"
+      assert _html =~ "chores"
     end
   end
 
@@ -46,8 +46,8 @@ defmodule TodoAppWeb.TodoLiveTest do
              |> form("#todo-form", todo: %{title: "New task"})
              |> render_submit()
 
-      html = render(view)
-      assert html =~ "New task"
+      _html = render(view)
+      assert _html =~ "New task"
     end
 
     test "parses hashtags and creates categories", %{conn: conn} do
@@ -57,18 +57,18 @@ defmodule TodoAppWeb.TodoLiveTest do
              |> form("#todo-form", todo: %{title: "Study for exam #education #urgent"})
              |> render_submit()
 
-      html = render(view)
-      assert html =~ "Study for exam"
-      assert html =~ "#education"
-      assert html =~ "#urgent"
-      assert html =~ "education"
-      assert html =~ "urgent"
+      _html = render(view)
+      assert _html =~ "Study for exam"
+      assert _html =~ "#education"
+      assert _html =~ "#urgent"
+      assert _html =~ "education"
+      assert _html =~ "urgent"
     end
 
     test "handles empty title gracefully without showing validation errors", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/")
 
-      html =
+      _html =
         view
         |> form("#todo-form", todo: %{title: ""})
         |> render_submit()
@@ -81,7 +81,7 @@ defmodule TodoAppWeb.TodoLiveTest do
     test "validates todo on change without displaying errors", %{conn: conn} do
       {:ok, view, _html} = live(conn, ~p"/")
 
-      html =
+      _html =
         view
         |> form("#todo-form", todo: %{title: ""})
         |> render_change()
@@ -104,8 +104,8 @@ defmodule TodoAppWeb.TodoLiveTest do
       updated_todo = Todos.get_todo!(todo.id)
       assert updated_todo.completed == true
 
-      html = render(view)
-      assert html =~ "line-through"
+      _html = render(view)
+      assert _html =~ "line-through"
     end
 
     test "untoggle completed todo", %{conn: conn} do
@@ -120,8 +120,8 @@ defmodule TodoAppWeb.TodoLiveTest do
       updated_todo = Todos.get_todo!(todo.id)
       assert updated_todo.completed == false
 
-      html = render(view)
-      refute html =~ "line-through"
+      _html = render(view)
+      refute _html =~ "line-through"
     end
   end
 
@@ -135,8 +135,8 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='delete_todo'][phx-value-id='#{todo.id}']")
       |> render_click()
 
-      html = render(view)
-      refute html =~ "Delete me"
+      _html = render(view)
+      refute _html =~ "Delete me"
 
       assert_raise Ecto.NoResultsError, fn ->
         Todos.get_todo!(todo.id)
@@ -154,9 +154,9 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='delete_todo'][phx-value-id='#{todo.id}']")
       |> render_click()
 
-      html = render(view)
-      refute html =~ "Clean kitchen"
-      refute html =~ "#chores"
+      _html = render(view)
+      refute _html =~ "Clean kitchen"
+      refute _html =~ "#chores"
     end
   end
 
@@ -170,10 +170,10 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
-      html = render(view)
-      assert html =~ "edit-todo-form-#{todo.id}"
-      assert html =~ "Save"
-      assert html =~ "Cancel"
+      _html = render(view)
+      assert _html =~ "edit-todo-form-#{todo.id}"
+      assert _html =~ "Save"
+      assert _html =~ "Cancel"
     end
 
     test "reconstructs hashtags in edit field", %{conn: conn} do
@@ -188,9 +188,9 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
-      html = render(view)
+      _html = render(view)
       # Our current implementation shows the original title with hashtags preserved
-      assert html =~ "Buy groceries"
+      assert _html =~ "Buy groceries"
     end
 
     test "saves edited todo preserving hashtags in title", %{conn: conn} do
@@ -208,11 +208,11 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> form("#edit-todo-form-#{todo.id}", todo: %{title: "Updated task #work #urgent"})
       |> render_submit()
 
-      html = render(view)
-      assert html =~ "Updated task"
-      assert html =~ "#work"
-      assert html =~ "#urgent"
-      refute html =~ "Original task"
+      _html = render(view)
+      assert _html =~ "Updated task"
+      assert _html =~ "#work"
+      assert _html =~ "#urgent"
+      refute _html =~ "Original task"
 
       # Verify database was updated - our implementation preserves hashtags in title
       updated_todo = Todos.get_todo!(todo.id)
@@ -234,11 +234,11 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='cancel_edit']")
       |> render_click()
 
-      html = render(view)
-      refute html =~ "edit-todo-form-#{todo.id}"
-      refute html =~ "Save"
-      refute html =~ "Cancel"
-      assert html =~ "Don&#39;t edit me"
+      _html = render(view)
+      refute _html =~ "edit-todo-form-#{todo.id}"
+      refute _html =~ "Save"
+      refute _html =~ "Cancel"
+      assert _html =~ "Don&#39;t edit me"
     end
 
     test "hides add todo form during edit mode", %{conn: conn} do
@@ -251,9 +251,9 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
-      html = render(view)
+      _html = render(view)
       # The add todo form should be hidden during edit mode
-      refute html =~ "Add New Todo... (use #hashtags for categories)"
+      refute _html =~ "Add New Todo... (use #hashtags for categories)"
     end
 
     test "shows add todo form after editing complete", %{conn: conn} do
@@ -271,8 +271,8 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> form("#edit-todo-form-#{todo.id}", todo: %{title: "Edited"})
       |> render_submit()
 
-      html = render(view)
-      assert html =~ "todo-form"
+      _html = render(view)
+      assert _html =~ "todo-form"
     end
   end
 
@@ -294,18 +294,18 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='filter_by_category'][phx-value-category='work']")
       |> render_click()
 
-      html = render(view)
-      assert html =~ "Work task"
-      refute html =~ "Home task"
+      _html = render(view)
+      assert _html =~ "Work task"
+      refute _html =~ "Home task"
 
       # Filter by home category
       view
       |> element("button[phx-click='filter_by_category'][phx-value-category='home']")
       |> render_click()
 
-      html = render(view)
-      assert html =~ "Home task"
-      refute html =~ "Work task"
+      _html = render(view)
+      assert _html =~ "Home task"
+      refute _html =~ "Work task"
     end
 
     test "shows all todos when filtering by 'all'", %{conn: conn} do
@@ -330,9 +330,9 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='filter_by_category'][phx-value-category='all']")
       |> render_click()
 
-      html = render(view)
-      assert html =~ "Work task"
-      assert html =~ "Home task"
+      _html = render(view)
+      assert _html =~ "Work task"
+      assert _html =~ "Home task"
     end
 
     test "highlights active filter button", %{conn: conn} do
@@ -346,8 +346,8 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> element("button[phx-click='filter_by_category'][phx-value-category='work']")
       |> render_click()
 
-      html = render(view)
-      assert html =~ "bg-green-100 text-green-800"
+      _html = render(view)
+      assert _html =~ "bg-green-100 text-green-800"
     end
   end
 
@@ -363,7 +363,7 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> render_click()
 
       # Change to empty title - our implementation handles this gracefully
-      html =
+      _html =
         view
         |> form("#edit-todo-form-#{todo.id}", todo: %{title: ""})
         |> render_change()
@@ -383,7 +383,7 @@ defmodule TodoAppWeb.TodoLiveTest do
       |> render_click()
 
       # Try to submit empty title - our implementation handles this gracefully
-      html =
+      _html =
         view
         |> form("#edit-todo-form-#{todo.id}", todo: %{title: ""})
         |> render_submit()
