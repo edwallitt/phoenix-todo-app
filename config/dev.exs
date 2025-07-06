@@ -5,7 +5,11 @@ config :todo_app, TodoApp.Repo,
   database: Path.expand("../todo_app_dev.db", Path.dirname(__ENV__.file)),
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 5
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  port: 5432,
+  pool_size: 10
 
 # For development, we disable any cache and enable
 # debugging and code reloading.
