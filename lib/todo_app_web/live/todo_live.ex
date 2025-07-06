@@ -83,7 +83,7 @@ defmodule TodoAppWeb.TodoLive do
     {:noreply, assign(socket, :editing_todo, nil)}
   end
 
-  def handle_event("save_edit", %{"id" => id, "title" => title}, socket) do
+  def handle_event("save_edit", %{"id" => id, "todo" => %{"title" => title}}, socket) do
     todo = Todos.get_todo!(id)
 
     case Todos.update_todo(todo, %{title: title}) do
