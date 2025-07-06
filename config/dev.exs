@@ -2,7 +2,7 @@ import Config
 
 # Configure your database
 config :todo_app, TodoApp.Repo,
-  database: Path.expand("../todo_app_dev.db", Path.dirname(__ENV__.file)),
+  database: "todo_app_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   username: "postgres",
