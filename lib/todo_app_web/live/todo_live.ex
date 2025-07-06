@@ -131,6 +131,11 @@ defmodule TodoAppWeb.TodoLive do
   end
 
   def handle_event("validate", %{"todo" => todo_params}, socket) do
+    def handle_event("validate_edit", %{"id" => _id, "todo" => todo_params}, socket) do
+      form = to_form(Todo.changeset(%Todo{}, todo_params), as: :todo)
+      {:noreply, assign(socket, :form, form)}
+    end
+
     form = to_form(Todo.changeset(%Todo{}, todo_params), as: :todo)
     {:noreply, assign(socket, :form, form)}
   end
