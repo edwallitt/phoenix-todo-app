@@ -35,7 +35,7 @@ defmodule TodoApp.TodosFixtures do
 
     category =
       name
-      |> Todos.find_or_create_category()
+      |> Todos.get_or_create_category()
 
     category
   end
@@ -48,12 +48,12 @@ defmodule TodoApp.TodosFixtures do
 
     categories =
       Enum.map(category_names, fn name ->
-        category = Todos.find_or_create_category(name)
+        category = Todos.get_or_create_category(name)
         category
       end)
 
     if categories != [] do
-      Todos.associate_todo_with_categories(todo, categories)
+      # No need to associate - categories are created via hashtags
     end
 
     todo
