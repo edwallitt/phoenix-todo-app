@@ -3,6 +3,6 @@ defmodule TodoAppWeb.PageControllerTest do
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")
-    assert html_response(conn, 200) =~ "Clinical Todo"
+    assert html_response(conn, 200) =~ "Ed's Todo List"
   end
 end
