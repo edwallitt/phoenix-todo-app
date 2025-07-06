@@ -8,7 +8,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
   describe "mount" do
     test "displays empty state when no todos exist", %{conn: conn} do
-      {:ok, _view, _html} = live(conn, ~p"/")
+      {:ok, _view, html} = live(conn, ~p"/")
 
       assert html =~ "Ed&#39;s Todo List"
       assert html =~ "Ed&#39;s Todo List"
@@ -20,7 +20,7 @@ defmodule TodoAppWeb.TodoLiveTest do
       category = category_fixture(%{name: "shopping"})
       Todos.associate_todo_with_categories(todo, [category])
 
-      {:ok, _view, _html} = live(conn, ~p"/")
+      {:ok, _view, html} = live(conn, ~p"/")
 
       assert html =~ "Buy groceries"
       assert html =~ "#shopping"
@@ -31,7 +31,7 @@ defmodule TodoAppWeb.TodoLiveTest do
       category = category_fixture(%{name: "chores"})
       Todos.associate_todo_with_categories(todo, [category])
 
-      {:ok, _view, _html} = live(conn, ~p"/")
+      {:ok, _view, html} = live(conn, ~p"/")
 
       assert html =~ "All"
       assert html =~ "chores"
