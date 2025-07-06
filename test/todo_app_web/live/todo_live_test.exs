@@ -10,8 +10,8 @@ defmodule TodoAppWeb.TodoLiveTest do
     test "displays empty state when no todos exist", %{conn: conn} do
       {:ok, _view, html} = live(conn, ~p"/")
 
-      assert html =~ "Ed's Todo List"
-      assert html =~ "Ed's Todo List"
+      assert html =~ "Ed&#39;s Todo List"
+      assert html =~ "Ed&#39;s Todo List"
       assert html =~ "Add New Todo"
     end
 
