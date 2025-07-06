@@ -9,7 +9,7 @@ defmodule TodoAppWeb.TodoLive do
       Phoenix.PubSub.subscribe(TodoApp.PubSub, "todos")
     end
 
-    todos = Todos.list_todos() |> Todos.preload_notes()
+    todos = Todos.list_todos()
     categories = Todos.list_categories()
 
     {:ok,
@@ -119,9 +119,9 @@ defmodule TodoAppWeb.TodoLive do
   def handle_event("filter_by_category", %{"category" => category}, socket) do
     todos =
       if category == "all" do
-        Todos.list_todos() |> Todos.preload_notes()
+        Todos.list_todos()
       else
-        Todos.list_todos_by_category(category) |> Todos.preload_notes()
+        Todos.list_todos_by_category(category)
       end
 
     {:noreply,
@@ -173,10 +173,10 @@ defmodule TodoAppWeb.TodoLive do
   defp list_todos_for_current_filter(socket) do
     case socket.assigns.selected_category do
       nil ->
-        Todos.list_todos() |> Todos.preload_notes()
+        Todos.list_todos()
 
       category ->
-        Todos.list_todos_by_category(category) |> Todos.preload_notes()
+        Todos.list_todos_by_category(category)
     end
   end
 end
