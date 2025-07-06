@@ -189,7 +189,7 @@ defmodule TodoApp.Todos do
   ## Examples
 
       iex> change_todo(todo)
-      %Ecto.Changesetdo{}}
+      %Ecto.Changeset{}
 
   """
   def change_todo(%Todo{} = todo, attrs \\ %{}) do
@@ -284,7 +284,7 @@ defmodule TodoApp.Todos do
   ## Examples
 
       iex> change_category(category)
-      %Ecto.Changeset{}}
+      %Ecto.Changeset{}
 
   """
   def change_category(%Category{} = category, attrs \\ %{}) do
@@ -384,7 +384,7 @@ defmodule TodoApp.Todos do
   ## Examples
 
       iex> change_note(note)
-      %Ecto.Changeset{}}
+      %Ecto.Changeset{}
 
   """
   def change_note(%Note{} = note, attrs \\ %{}) do
@@ -428,14 +428,15 @@ defmodule TodoApp.Todos do
     end
   end
 
-  @doc """\
-  Associates a todo with categories.\
-  """\
-  def associate_todo_with_categories(%Todo{} = todo, categories) when is_list(categories) do\
-    Enum.each(categories, fn category ->\
-      create_todo_category(%{todo_id: todo.id, category_id: category.id})\
-    end)\
+  @doc """
+  Associates a todo with categories.
+  """
+  def associate_todo_with_categories(%Todo{} = todo, categories) when is_list(categories) do
+    Enum.each(categories, fn category ->
+      create_todo_category(%{todo_id: todo.id, category_id: category.id})
+    end)
   end
+
   defp update_todo_categories(todo, new_title) do
     # Remove existing associations
     from(tc in TodoCategory, where: tc.todo_id == ^todo.id)
