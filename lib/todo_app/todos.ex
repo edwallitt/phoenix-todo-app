@@ -1,169 +1,128 @@
 defmodule TodoApp.Todos do
   @moduledoc """
-  The Todos context for managing todo items and categories.
+  The Todos context.
   """
 
   import Ecto.Query, warn: false
   alias TodoApp.Repo
-  alias TodoApp.Todos.{Todo, Category, TodoCategory}
+
+  alias TodoApp.Todos.Todo
+  alias TodoApp.Todos.Category
+  alias TodoApp.Todos.TodoCategory
+  alias TodoApp.Todos.Note
 
   @doc """
-  Parses hashtags and #imp flag from a title string and returns {clean_title, [category_names], is_important}.
+  Returns the list of todos with preloaded categories for efficient querying.
   """
-  def parse_hashtags_and_importance_from_title(title) do
-    # Find all hashtags in the title
-    hashtag_regex = ~r/#(\w+)/
-    matches = Regex.scan(hashtag_regex, title, capture: :all_but_first)
-    all_hashtags = List.flatten(matches)
-
-    # Check if #imp is present and filter it out from categories
-    is_important = "imp" in all_hashtags
-    category_names = Enum.reject(all_hashtags, fn tag -> tag == "imp" end)
-
-    # Remove hashtags from title and clean up extra spaces
-    clean_title =
-      title
-      |> String.replace(hashtag_regex, "")
-      |> String.trim()
-      |> String.replace(~r/\s+/, " ")
-
-    {clean_title, category_names, is_important}
+  def list_todos do
+    Todo
+    |> preload(categories: :categories)
+    |> order_by([t], desc: t.inserted_at)
+    |> Repo.all()
   end
 
   @doc """
-  Returns the list of todos ordered by importance first, then by insertion date (newest first).
-  Optionally filters by category.
+  Returns todos filtered by category with optimized queries.
   """
-  def list_todos(category_filter \\ nil) do
-    query =
-      from t in Todo,
-        preload: [:categories],
-        order_by: [desc: t.important, desc: t.inserted_at]
+  def list_todos_by_category(category_id) when is_integer(category_id) do
+    Todo
+    |> join(:inner, [t], tc in TodoCategory, on: tc.todo_id == t.id)
+    |> where([t, tc], tc.category_id == ^category_id)
+    |> preload(categories: :categories)
+    |> order_by([t], desc: t.inserted_at)
+    |> Repo.all()
+  end
 
-    query =
-      if category_filter do
-        from t in query,
-          join: tc in TodoCategory,
-          on: tc.todo_id == t.id,
-          join: c in Category,
-          on: c.id == tc.category_id,
-          where: c.slug == ^category_filter
-      else
-        query
-      end
+  def list_todos_by_category(_), do: list_todos()
 
-    Repo.all(query)
+  @doc """
+  Gets a single todo with preloaded associations.
+  """
+  def get_todo!(id) do
+    Todo
+    |> preload(categories: :categories)
+    |> Repo.get!(id)
   end
 
   @doc """
-  Gets a single todo.
-  """
-  def get_todo!(id), do: Repo.get!(Todo, id) |> Repo.preload(:categories)
-
-  @doc """
-  Gets a single todo with notes preloaded.
+  Gets a single todo with notes preloaded for the notes page.
   """
   def get_todo_with_notes!(id) do
-    get_todo!(id) |> Repo.preload(:notes)
+    Todo
+    |> preload([:notes, categories: :categories])
+    |> Repo.get!(id)
   end
 
   @doc """
-  Creates a todo with hashtag parsing for categories.
+  Creates a todo with intelligent hashtag parsing and category creation.
   """
   def create_todo(attrs \\ %{}) do
-    title = Map.get(attrs, "title", "")
+    # Extract hashtags from title
+    {clean_title, hashtags} = extract_hashtags(attrs["title"] || "")
 
-    # Parse hashtags, importance flag and clean title
-    {clean_title, category_names, is_important} = parse_hashtags_and_importance_from_title(title)
+    # Update attrs with clean title
+    clean_attrs = Map.put(attrs, "title", clean_title)
 
-    # Create the todo with clean title
-    clean_attrs = attrs |> Map.put("title", clean_title) |> Map.put("important", is_important)
+    # Start a transaction to ensure consistency
+    Repo.transaction(fn ->
+      # Create the todo
+      case %Todo{}
+           |> Todo.changeset(clean_attrs)
+           |> Repo.insert() do
+        {:ok, todo} ->
+          # Process hashtags and create categories
+          process_hashtags(todo, hashtags)
 
-    case %Todo{}
-         |> Todo.create_changeset(clean_attrs)
-         |> Repo.insert() do
-      {:ok, todo} ->
-        # Associate with categories
-        todo_with_categories = associate_todo_with_categories(todo, category_names)
-        {:ok, todo_with_categories}
+          # Return todo with preloaded categories
+          get_todo!(todo.id)
 
-      {:error, changeset} ->
-        {:error, changeset}
-    end
+        {:error, changeset} ->
+          Repo.rollback(changeset)
+      end
+    end)
   end
 
   @doc """
-  Updates a todo.
+  Updates a todo with hashtag processing.
   """
   def update_todo(%Todo{} = todo, attrs) do
-    todo
-    |> Todo.changeset(attrs)
-    |> Repo.update()
+    # Extract hashtags from new title
+    {clean_title, hashtags} = extract_hashtags(attrs["title"] || todo.title)
+
+    # Update attrs with clean title
+    clean_attrs = Map.put(attrs, "title", clean_title)
+
+    Repo.transaction(fn ->
+      case todo
+           |> Todo.changeset(clean_attrs)
+           |> Repo.update() do
+        {:ok, updated_todo} ->
+          # Clear existing categories and add new ones
+          clear_todo_categories(updated_todo)
+          process_hashtags(updated_todo, hashtags)
+
+          # Return updated todo with preloaded categories
+          get_todo!(updated_todo.id)
+
+        {:error, changeset} ->
+          Repo.rollback(changeset)
+      end
+    end)
   end
 
   @doc """
-  Updates a todo with hashtag parsing for categories.
-  """
-  def update_todo_with_hashtags(%Todo{} = todo, attrs) do
-    title = Map.get(attrs, "title", "")
-
-    # Parse hashtags and check for #imp flag
-    {clean_title, category_names, is_important} = parse_hashtags_and_importance_from_title(title)
-
-    # Update the todo with clean title and important flag
-    clean_attrs = attrs |> Map.put("title", clean_title) |> Map.put("important", is_important)
-
-    case todo
-         |> Todo.changeset(clean_attrs)
-         |> Repo.update() do
-      {:ok, updated_todo} ->
-        # Clear existing category associations
-        from(tc in TodoCategory, where: tc.todo_id == ^updated_todo.id)
-        |> Repo.delete_all()
-
-        # Associate with new categories
-        todo_with_categories = associate_todo_with_categories(updated_todo, category_names)
-        {:ok, todo_with_categories}
-
-      {:error, changeset} ->
-        {:error, changeset}
-    end
-  end
-
-  @doc """
-  Deletes a todo.
+  Deletes a todo and cleans up orphaned categories.
   """
   def delete_todo(%Todo{} = todo) do
     Repo.transaction(fn ->
-      # Get all categories associated with this todo before deletion
-      category_ids =
-        from(tc in TodoCategory, where: tc.todo_id == ^todo.id, select: tc.category_id)
-        |> Repo.all()
+      # Get categories before deletion for cleanup
+      category_ids = get_todo_category_ids(todo.id)
 
-      # Delete all notes associated with this todo\
-      from(n in TodoApp.Todos.Note, where: n.todo_id == ^todo.id) |> Repo.delete_all()
-
-      # Delete the todo (this will also delete join table entries if we had foreign key constraints)
+      # Delete the todo (cascades to todo_categories and notes)
       case Repo.delete(todo) do
         {:ok, deleted_todo} ->
-          # Manually delete join table entries (in case no FK constraints)
-          from(tc in TodoCategory, where: tc.todo_id == ^todo.id)
-          |> Repo.delete_all()
-
-          # Check each category to see if it's now orphaned and delete if so
-          Enum.each(category_ids, fn category_id ->
-            remaining_todos_count =
-              from(tc in TodoCategory, where: tc.category_id == ^category_id, select: count())
-              |> Repo.one()
-
-            if remaining_todos_count == 0 do
-              case Repo.get(Category, category_id) do
-                nil -> :ok
-                category -> Repo.delete(category)
-              end
-            end
-          end)
-
+          # Clean up orphaned categories
+          cleanup_orphaned_categories(category_ids)
           deleted_todo
 
         {:error, changeset} ->
@@ -172,14 +131,136 @@ defmodule TodoApp.Todos do
     end)
   end
 
-  alias TodoApp.Todos.Note
+  # Private helper functions
 
-  def preload_notes(todos) do
-    Repo.preload(todos, :notes)
+  defp extract_hashtags(title) when is_binary(title) do
+    # Match hashtags (# followed by word characters)
+    hashtags =
+      Regex.scan(~r/#\w+/, title)
+      |> Enum.map(fn [hashtag] -> String.slice(hashtag, 1..-1) end)
+      |> Enum.uniq()
+
+    # Remove hashtags from title
+    clean_title = Regex.replace(~r/#\w+\s*/, title, "") |> String.trim()
+
+    {clean_title, hashtags}
   end
 
+  defp process_hashtags(todo, hashtags) do
+    Enum.each(hashtags, fn hashtag_name ->
+      # Get or create category
+      category = get_or_create_category(hashtag_name)
+
+      # Create association if it doesn't exist
+      %TodoCategory{}
+      |> TodoCategory.changeset(%{todo_id: todo.id, category_id: category.id})
+      |> Repo.insert(on_conflict: :nothing)
+    end)
+  end
+
+  defp get_or_create_category(name) do
+    slug = String.downcase(name) |> String.replace(~r/[^\w-]/, "-")
+
+    case Repo.get_by(Category, slug: slug) do
+      nil ->
+        %Category{}
+        |> Category.changeset(%{name: name, slug: slug})
+        |> Repo.insert!()
+
+      category ->
+        category
+    end
+  end
+
+  defp clear_todo_categories(todo) do
+    from(tc in TodoCategory, where: tc.todo_id == ^todo.id)
+    |> Repo.delete_all()
+  end
+
+  defp get_todo_category_ids(todo_id) do
+    from(tc in TodoCategory, where: tc.todo_id == ^todo_id, select: tc.category_id)
+    |> Repo.all()
+  end
+
+  defp cleanup_orphaned_categories(category_ids) do
+    # Find categories that no longer have any todos
+    orphaned_ids =
+      from(c in Category,
+        where: c.id in ^category_ids,
+        left_join: tc in TodoCategory,
+        on: tc.category_id == c.id,
+        group_by: c.id,
+        having: count(tc.id) == 0,
+        select: c.id
+      )
+      |> Repo.all()
+
+    # Delete orphaned categories
+    if orphaned_ids != [] do
+      from(c in Category, where: c.id in ^orphaned_ids)
+      |> Repo.delete_all()
+    end
+  end
+
+  # Category functions remain the same but with optimized queries
+
+  @doc """
+  Returns the list of categories ordered by usage.
+  """
+  def list_categories do
+    Category
+    |> join(:left, [c], tc in TodoCategory, on: tc.category_id == c.id)
+    |> group_by([c], c.id)
+    |> order_by([c], desc: count(), asc: c.name)
+    |> Repo.all()
+  end
+
+  @doc """
+  Gets a single category.
+  """
+  def get_category!(id), do: Repo.get!(Category, id)
+
+  @doc """
+  Creates a category.
+  """
+  def create_category(attrs \\ %{}) do
+    %Category{}
+    |> Category.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a category.
+  """
+  def update_category(%Category{} = category, attrs) do
+    category
+    |> Category.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a category and its associations.
+  """
+  def delete_category(%Category{} = category) do
+    Repo.transaction(fn ->
+      # Delete all todo_category associations
+      from(tc in TodoCategory, where: tc.category_id == ^category.id)
+      |> Repo.delete_all()
+
+      # Delete the category
+      Repo.delete(category)
+    end)
+  end
+
+  # Note functions with optimized queries
+
+  @doc """
+  Returns the list of notes for a todo, ordered by creation date.
+  """
   def list_notes_for_todo(todo_id) do
-    from(n in Note, where: n.todo_id == ^todo_id, order_by: [desc: n.inserted_at])
+    Note
+    |> where([n], n.todo_id == ^todo_id)
+    |> order_by([n], desc: n.inserted_at)
     |> Repo.all()
   end
 
@@ -189,38 +270,28 @@ defmodule TodoApp.Todos do
   def get_note!(id), do: Repo.get!(Note, id)
 
   @doc """
-  Creates a note for a specific todo.
+  Creates a note.
   """
-  def create_note(todo, attrs \\ %{}) do
-    attrs_with_todo_id = Map.put(attrs, "todo_id", todo.id)
-
+  def create_note(attrs \\ %{}) do
     %Note{}
-    |> Note.changeset(attrs_with_todo_id)
+    |> Note.changeset(attrs)
     |> Repo.insert()
-    |> case do
-      {:ok, note} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "notes:#{todo.id}", {:note_created, note})
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:note_created, note})
-        {:ok, note}
+  end
 
-      error ->
-        error
-    end
+  @doc """
+  Updates a note.
+  """
+  def update_note(%Note{} = note, attrs) do
+    note
+    |> Note.changeset(attrs)
+    |> Repo.update()
   end
 
   @doc """
   Deletes a note.
   """
   def delete_note(%Note{} = note) do
-    case Repo.delete(note) do
-      {:ok, note} ->
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "notes:#{note.todo_id}", {:note_deleted, note})
-        Phoenix.PubSub.broadcast(TodoApp.PubSub, "todos", {:note_deleted, note})
-        {:ok, note}
-
-      error ->
-        error
-    end
+    Repo.delete(note)
   end
 
   @doc """
@@ -230,120 +301,17 @@ defmodule TodoApp.Todos do
     Note.changeset(note, attrs)
   end
 
-  def reconstruct_title_with_hashtags(todo) do
-    category_hashtags = Enum.map(todo.categories, fn category -> "##{category.name}" end)
-    importance_hashtag = if todo.important, do: ["#imp"], else: []
-    all_hashtags = category_hashtags ++ importance_hashtag
-
-    if Enum.empty?(all_hashtags) do
-      todo.title
-    else
-      todo.title <> " " <> Enum.join(all_hashtags, " ")
-    end
-  end
-
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking todo changes.
+  """
   def change_todo(%Todo{} = todo, attrs \\ %{}) do
     Todo.changeset(todo, attrs)
   end
 
   @doc """
-  Returns all categories ordered by name.
+  Returns an `%Ecto.Changeset{}` for tracking category changes.
   """
-  def list_categories do
-    Repo.all(from c in Category, order_by: c.name)
-  end
-
-  @doc """
-  Gets a single category.
-  """
-  def get_category!(id), do: Repo.get!(Category, id)
-
-  @doc """
-  Deletes a category and all associated todo-category relationships.
-  """
-  def delete_category(%Category{} = category) do
-    # Delete all todo-category associations first
-    from(tc in TodoCategory, where: tc.category_id == ^category.id)
-    |> Repo.delete_all()
-
-    # Then delete the category
-    Repo.delete(category)
-  end
-
-  @doc """
-  Returns the count of todos associated with a category.
-  """
-  def get_category_todo_count(category_id) do
-    from(tc in TodoCategory, where: tc.category_id == ^category_id, select: count())
-    |> Repo.one()
-  end
-
-  @doc """
-  Returns todos filtered by category slug.
-  """
-  def list_todos_by_category(category_slug) do
-    from(t in Todo,
-      join: tc in TodoCategory,
-      on: tc.todo_id == t.id,
-      join: c in Category,
-      on: c.id == tc.category_id,
-      where: c.slug == ^category_slug,
-      preload: [:categories],
-      order_by: [desc: t.important, desc: t.inserted_at]
-    )
-    |> Repo.all()
-  end
-
-  @doc """
-  Finds or creates categories and associates them with a todo.
-  """
-  def associate_todo_with_categories(todo, categories_or_names) do
-    categories =
-      Enum.map(categories_or_names, fn category_or_name ->
-        case category_or_name do
-          %Category{} = category -> category
-          name when is_binary(name) -> find_or_create_category(name)
-        end
-      end)
-
-    # Create associations
-    Enum.each(categories, fn category ->
-      %TodoCategory{}
-      |> TodoCategory.changeset(%{todo_id: todo.id, category_id: category.id})
-      |> Repo.insert(on_conflict: :nothing)
-    end)
-
-    # Return todo with preloaded categories
-    Repo.preload(todo, :categories, force: true)
-  end
-
-  @doc """
-  Finds an existing category or creates a new one.
-  """
-  def find_or_create_category(name) do
-    slug = slugify(name)
-
-    case Repo.get_by(Category, slug: slug) do
-      nil ->
-        {:ok, category} =
-          %Category{}
-          |> Category.changeset(%{name: name, slug: slug})
-          |> Repo.insert()
-
-        category
-
-      category ->
-        category
-    end
-  end
-
-  @doc """
-  Converts a string to a URL-friendly slug.
-  """
-  def slugify(string) do
-    string
-    |> String.downcase()
-    |> String.replace(~r/[^a-z0-9\s]/, "")
-    |> String.replace(~r/\s+/, " ")
+  def change_category(%Category{} = category, attrs \\ %{}) do
+    Category.changeset(category, attrs)
   end
 end
