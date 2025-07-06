@@ -6,10 +6,14 @@ import Config
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
 config :todo_app, TodoApp.Repo,
-  database: Path.expand("../todo_app_test.db", __DIR__),
+  database: "todo_app_test",
+  username: "postgres",
+  password: "postgres",
+  hostname: "localhost",
+  database: "todo_app_test",
   pool_size: 5,
   pool: Ecto.Adapters.SQL.Sandbox,
-  adapter: Ecto.Adapters.SQLite3
+  adapter: Ecto.Adapters.Postgres
 
 # We don't run a server during test. If one is required,
 # you can enable the server option below.
