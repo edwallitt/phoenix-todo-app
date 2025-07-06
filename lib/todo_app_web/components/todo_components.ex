@@ -46,6 +46,7 @@ defmodule TodoAppWeb.TodoComponents do
               <form
                 id={"edit-todo-form-#{@todo.id}"}
                 phx-submit={@on_save_edit}
+                phx-change="validate_edit"
                 phx-value-id={@todo.id}
                 class="flex items-center space-x-2"
               >
