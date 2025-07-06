@@ -81,6 +81,7 @@ defmodule TodoAppWeb do
       import Phoenix.HTML
       # Core UI components
       import TodoAppWeb.CoreComponents
+      import TodoAppWeb.TodoComponents
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS
