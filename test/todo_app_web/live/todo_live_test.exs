@@ -73,9 +73,9 @@ defmodule TodoAppWeb.TodoLiveTest do
         |> form("#todo-form", todo: %{title: ""})
         |> render_submit()
 
-      # The form should handle empty titles gracefully - no error display expected
-      # since our current implementation doesn't show validation errors in the UI
-      refute html =~ "can&#39;t be blank"
+      # The form should show validation errors for empty titles
+      # since our current implementation shows validation errors in the UI
+      assert html =~ "canrefute html =~ "can&#39;t be blank"#39;t be blank"
     end
 
     test "validates todo on change without displaying errors", %{conn: conn} do
@@ -86,8 +86,8 @@ defmodule TodoAppWeb.TodoLiveTest do
         |> form("#todo-form", todo: %{title: ""})
         |> render_change()
 
-      # Our current implementation doesn't display validation errors in the UI
-      refute html =~ "can&#39;t be blank"
+      # Our current implementation displays validation errors in the UI
+      assert html =~ "canrefute html =~ "can&#39;t be blank"#39;t be blank"
     end
   end
 
@@ -368,8 +368,8 @@ defmodule TodoAppWeb.TodoLiveTest do
         |> form("#edit-todo-form-#{todo.id}", todo: %{title: ""})
         |> render_change()
 
-      # Our current implementation doesn't display validation errors in edit mode
-      refute html =~ "can&#39;t be blank"
+      # Our current implementation displays validation errors in edit mode
+      assert html =~ "canrefute html =~ "can&#39;t be blank"#39;t be blank"
     end
 
     test "handles edit form submission with empty data gracefully", %{conn: conn} do
@@ -388,8 +388,8 @@ defmodule TodoAppWeb.TodoLiveTest do
         |> form("#edit-todo-form-#{todo.id}", todo: %{title: ""})
         |> render_submit()
 
-      # Our current implementation doesn't show validation errors in the UI
-      refute html =~ "can&#39;t be blank"
+      # Our current implementation shows validation errors in the UI
+      assert html =~ "canrefute html =~ "can&#39;t be blank"#39;t be blank"
     end
   end
 end
