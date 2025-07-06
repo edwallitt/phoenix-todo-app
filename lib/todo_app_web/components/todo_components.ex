@@ -19,7 +19,7 @@ defmodule TodoAppWeb.TodoComponents do
 
   def todo_item(assigns) do
     ~H"""
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 mb-3 hover:shadow-md transition-shadow duration-200">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-3 hover:shadow-md transition-shadow duration-200">
       <div class="flex items-center justify-between">
         <div class="flex items-center space-x-3 flex-1">
           <!-- Completion Toggle -->
@@ -73,7 +73,7 @@ defmodule TodoAppWeb.TodoComponents do
               <!-- Display Mode -->
               <div class="flex items-center space-x-2">
                 <span class={[
-                  "text-gray-900 dark:text-gray-100",
+                  "text-gray-900",
                   @todo.completed && "line-through text-gray-500 dark:text-gray-400"
                 ]}>
                   {@todo.title}
@@ -172,8 +172,8 @@ defmodule TodoAppWeb.TodoComponents do
 
   def todo_form(assigns) do
     ~H"""
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Add New Todo</h2>
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Add New Todo</h2>
 
       <.form for={@form} id="todo-form" phx-change={@on_change} phx-submit={@on_submit}>
         <div class="flex space-x-3">
