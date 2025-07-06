@@ -184,6 +184,7 @@ defmodule TodoAppWeb.TodoComponents do
               type="text"
               placeholder="What needs to be done? Use #hashtags for categories"
               class="w-full px-4 py-3 text-gray-900 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-500"
+              error_class="border-red-400 focus:border-red-500 focus:ring focus:ring-red-300"
             />
           </div>
           <button
