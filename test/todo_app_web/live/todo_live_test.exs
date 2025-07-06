@@ -164,7 +164,7 @@ defmodule TodoAppWeb.TodoLiveTest do
       {:ok, view, _html} = live(conn, ~p"/")
 
       view
-      |> element("div[phx-click='start_edit'][phx-value-id='#{todo.id}']")
+      |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
       html = render(view)
@@ -182,7 +182,7 @@ defmodule TodoAppWeb.TodoLiveTest do
       {:ok, view, _html} = live(conn, ~p"/")
 
       view
-      |> element("div[phx-click='start_edit'][phx-value-id='#{todo.id}']")
+      |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
       html = render(view)
@@ -198,7 +198,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       # Start editing
       view
-      |> element("div[phx-click='start_edit'][phx-value-id='#{todo.id}']")
+      |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
       # Submit edit with new title and hashtags
@@ -224,7 +224,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       # Start editing
       view
-      |> element("div[phx-click='start_edit'][phx-value-id='#{todo.id}']")
+      |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
       # Cancel editing
@@ -246,7 +246,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       # Start editing
       view
-      |> element("div[phx-click='start_edit'][phx-value-id='#{todo.id}']")
+      |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
       html = render(view)
@@ -261,7 +261,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       # Start editing
       view
-      |> element("div[phx-click='start_edit'][phx-value-id='#{todo.id}']")
+      |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
       # Save edit
@@ -357,7 +357,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       # Start editing
       view
-      |> element("div[phx-click='start_edit'][phx-value-id='#{todo.id}']")
+      |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
       # Change to empty title
@@ -376,7 +376,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       # Start editing
       view
-      |> element("div[phx-click='start_edit'][phx-value-id='#{todo.id}']")
+      |> element("button[phx-click='start_edit'][phx-value-id='#{todo.id}']")
       |> render_click()
 
       # Try to submit empty title
