@@ -75,7 +75,7 @@ defmodule TodoAppWeb.TodoLiveTest do
 
       # The form should show validation errors for empty titles
       # since our current implementation shows validation errors in the UI
-      assert html =~ "canrefute html =~ "can&#39;t be blank"#39;t be blank"
+      assert html =~ "can't be blank"
     end
 
     test "validates todo on change without displaying errors", %{conn: conn} do
@@ -87,7 +87,7 @@ defmodule TodoAppWeb.TodoLiveTest do
         |> render_change()
 
       # Our current implementation displays validation errors in the UI
-      assert html =~ "canrefute html =~ "can&#39;t be blank"#39;t be blank"
+      assert html =~ "can't be blank"
     end
   end
 
@@ -369,7 +369,7 @@ defmodule TodoAppWeb.TodoLiveTest do
         |> render_change()
 
       # Our current implementation displays validation errors in edit mode
-      assert html =~ "canrefute html =~ "can&#39;t be blank"#39;t be blank"
+      assert html =~ "can't be blank"
     end
 
     test "handles edit form submission with empty data gracefully", %{conn: conn} do
@@ -389,7 +389,7 @@ defmodule TodoAppWeb.TodoLiveTest do
         |> render_submit()
 
       # Our current implementation shows validation errors in the UI
-      assert html =~ "canrefute html =~ "can&#39;t be blank"#39;t be blank"
+      assert html =~ "can't be blank"
     end
   end
 end
