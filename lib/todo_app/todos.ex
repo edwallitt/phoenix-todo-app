@@ -414,7 +414,10 @@ defmodule TodoApp.Todos do
 
   defp extract_hashtags(_), do: []
 
-  defp get_or_create_category(name) do
+  @doc """
+  Gets or creates a category by name.
+  """
+  def get_or_create_category(name) do
     case Repo.get_by(Category, name: name) do
       nil ->
         {:ok, category} = create_category(%{name: name, slug: String.downcase(name)})
